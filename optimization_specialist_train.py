@@ -66,7 +66,7 @@ while not condition_to_stop:
     # parent selection
     # create offspring
     # evaluate offspring
-    # survival selection
+    # survivor selection
 
     # save results in the txt file and output relevant msgs
     # save file with the best solution
