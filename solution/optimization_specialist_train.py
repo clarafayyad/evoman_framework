@@ -12,42 +12,6 @@ env.state_to_log()
 # set time marker
 ini = time.time()
 
-
-# runs simulation/evaluation
-def simulation():
-    pass
-
-
-# normalizes
-def normalize():
-    pass
-
-
-# evaluates a solution
-def evaluate():
-    pass
-
-
-# tournament
-def parent_selection():
-    pass
-
-
-# crossover
-def crossover():
-    pass
-
-
-# mutation
-def mutation():
-    pass
-
-
-# kills the worst genomes, and replace with new best/random solutions
-def survival_selection():
-    pass
-
-
 # initialize population loading old solutions or generating new ones
 experiment_name = ''
 if not os.path.exists(experiment_name + '/evoman_solstate'):
