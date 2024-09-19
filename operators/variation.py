@@ -3,7 +3,7 @@ import numpy as np
 # Applies crossover on both parents to create children.
 def crossover(parent1, parent2):
         """
-        Apply non-blending arithmetic crossover to create two children from two parents.
+        Apply random arithmetic crossover to create two children from two parents.
 
         Args:
         - parent1: A numpy array of the first parent's parameters.
