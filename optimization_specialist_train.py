@@ -20,7 +20,8 @@ mutation_sigma = 0.1
 selection_pressure = 1.2
 
 # Initialize simulation
-env = Environment()
+experiment = 'experiments'
+env = Environment(experiment_name=experiment)
 
 # Compute individual size
 hidden_neurons = 10
@@ -37,8 +38,7 @@ ini = time.time()
 generation_number = 0
 
 # Initialize population loading old solutions or generating new ones
-experiment_name = 'experiments'
-if not os.path.exists(experiment_name + '/evoman_solstate'):
+if not os.path.exists(experiment + '/evoman_solstate'):
     print('\nNEW EVOLUTION\n')
     # Generate new population here
     population = operators.initialize_population(POPULATION_SIZE, individual_size, lower_bound, upper_bound)
@@ -54,11 +54,11 @@ else:
     fitness_values = env.solutions[1]
 
     # Retrieve last generation
-    generation_number = reporting.retrieve_last_generation(experiment_name)
+    generation_number = reporting.retrieve_last_generation(experiment)
 
 # Compute and log stats
 best_individual_index, mean, std = stats.compute_stats(fitness_values)
-reporting.log_stats(experiment_name, generation_number, fitness_values[best_individual_index], mean, std)
+reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 
 
 # Evolution
@@ -84,13 +84,13 @@ while generation_number < TOTAL_GENERATIONS:
 
     # Compute and log stats
     best_individual_index, mean, std = stats.compute_stats(fitness_values)
-    reporting.log_stats(experiment_name, generation_number, fitness_values[best_individual_index], mean, std)
+    reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 
     # Save generation number
-    reporting.save_generation(experiment_name, generation_number)
+    reporting.save_generation(experiment, generation_number)
 
     # Save file with the best solution
-    reporting.save_best_individual(experiment_name, population[best_individual_index])
+    reporting.save_best_individual(experiment, population[best_individual_index])
 
     # Update and save simulation state
     env.update_solutions([population, fitness_values])
