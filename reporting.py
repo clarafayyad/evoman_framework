@@ -45,7 +45,7 @@ def start_experiment(experiment_name, is_test=False):
     return ini_time
 
 
-def log_execution_time(execution_time):
+def end_experiment(execution_time):
     print('\nExecution time: ' + str(round(execution_time) / 60) + ' minutes')
     print('\nExecution time: ' + str(round(execution_time)) + ' seconds \n')
     print('\nEXPERIMENT COMPLETED\n')

@@ -11,4 +11,3 @@ def test_experiment(experiment_name, env):
     print('\n RUNNING SAVED BEST SOLUTION \n')
     env.update_parameter('speed', 'normal')
     operators.evaluate_population(env, [best_solution])
-    sys.exit(0)
