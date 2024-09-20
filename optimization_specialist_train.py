@@ -2,7 +2,6 @@
 from demo_controller import player_controller
 from evoman.environment import Environment
 import time
-
 import reporting
 import stats
 import operators
@@ -11,7 +10,7 @@ import operators
 POPULATION_SIZE = 100
 TOTAL_GENERATIONS = 50
 
-# Set Parameters
+# Set EA Operators Parameters
 lower_bound = -1
 upper_bound = 1
 tournament_size = 5
@@ -22,8 +21,11 @@ selection_pressure = 1.2
 # NN configuration
 hidden_neurons = 10
 
-# Initialize simulation
+# Start experiment
 experiment = 'experiments'
+ini_time = reporting.start_experiment(experiment)
+
+# Initialize simulation
 env = Environment(experiment_name=experiment,
                   enemies=[8],
                   playermode="ai",
@@ -39,13 +41,8 @@ individual_size = (env.get_num_sensors()+1)*hidden_neurons + (hidden_neurons+1)*
 # Log the environment state
 env.state_to_log()
 
-# Start timer
-ini = time.time()
-
 # Initialize generation counter
 generation_number = 0
-
-print('\nEXPERIMENT STARTED\n')
 
 # Initialize population
 population = operators.initialize_population(POPULATION_SIZE, individual_size, lower_bound, upper_bound)
@@ -84,9 +81,6 @@ while generation_number < TOTAL_GENERATIONS:
     best_individual_index, mean, std = stats.compute_stats(fitness_values)
     reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 
-    # Save generation number
-    reporting.save_generation(experiment, generation_number)
-
     # Save file with the best solution
     reporting.save_best_individual(experiment, population[best_individual_index])
 
@@ -97,7 +91,7 @@ while generation_number < TOTAL_GENERATIONS:
     generation_number += 1
 
 # Print total execution time
-reporting.log_execution_time(time.time() - ini)
+reporting.log_execution_time(time.time() - ini_time)
 
 # Log environment state
 # env.state_to_log()

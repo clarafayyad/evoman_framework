@@ -1,4 +1,6 @@
+import time
 import numpy as np
+import os
 
 def save_generation(experiment_name, generation_number):
     generation_file = open(experiment_name + '/gen.txt', 'w')
@@ -34,10 +36,32 @@ def save_best_individual(experiment_name, best_individual):
     np.savetxt(experiment_name + '/best.txt', best_individual)
 
 
+def start_experiment(experiment_name):
+    print('\nEXPERIMENT STARTED\n')
+    create_logs_directory(experiment_name)
+    clear_experiment_logs(experiment_name)
+    ini_time = time.time()
+    return ini_time
+
+
 def log_execution_time(execution_time):
     print('\nExecution time: ' + str(round(execution_time) / 60) + ' minutes')
     print('\nExecution time: ' + str(round(execution_time)) + ' seconds \n')
     print('\nEXPERIMENT COMPLETED\n')
 
 
+def clean_directory(directory):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+
+def clear_experiment_logs(experiment_name):
+    clean_directory('./' + experiment_name)
+
+
+def create_logs_directory(experiment_name):
+    if not os.path.exists('./' + experiment_name):
+        os.makedirs('./' + experiment_name)
 
