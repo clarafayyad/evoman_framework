@@ -1,7 +1,7 @@
 # imports
+from demo_controller import player_controller
 from evoman.environment import Environment
 import time
-import os
 
 import reporting
 import stats
@@ -19,14 +19,22 @@ mutation_rate = 0.2
 mutation_sigma = 0.1
 selection_pressure = 1.2
 
+# NN configuration
+hidden_neurons = 10
+
 # Initialize simulation
 experiment = 'experiments'
-env = Environment(experiment_name=experiment)
+env = Environment(experiment_name=experiment,
+                  enemies=[8],
+                  playermode="ai",
+                  player_controller=player_controller(hidden_neurons),
+                  enemymode="static",
+                  level=2,
+                  speed="fastest",
+                  visuals=False)
 
 # Compute individual size
-hidden_neurons = 10
 individual_size = (env.get_num_sensors()+1)*hidden_neurons + (hidden_neurons+1)*5
-
 
 # Log the environment state
 env.state_to_log()
@@ -37,24 +45,14 @@ ini = time.time()
 # Initialize generation counter
 generation_number = 0
 
-# Initialize population loading old solutions or generating new ones
-if not os.path.exists(experiment + '/evoman_solstate'):
-    print('\nNEW EVOLUTION\n')
-    # Generate new population here
-    population = operators.initialize_population(POPULATION_SIZE, individual_size, lower_bound, upper_bound)
-    fitness_values = operators.evaluate_population(env, population)
+print('\nEXPERIMENT STARTED\n')
 
-    # Save current population and fitness values
-    env.update_solutions([population, fitness_values])
-else:
-    print('\nCONTINUING EVOLUTION\n')
-    # Load env state
-    env.load_state()
-    population = env.solutions[0]
-    fitness_values = env.solutions[1]
+# Initialize population
+population = operators.initialize_population(POPULATION_SIZE, individual_size, lower_bound, upper_bound)
+fitness_values = operators.evaluate_population(env, population)
 
-    # Retrieve last generation
-    generation_number = reporting.retrieve_last_generation(experiment)
+# Save current population and fitness values
+env.update_solutions([population, fitness_values])
 
 # Compute and log stats
 best_individual_index, mean, std = stats.compute_stats(fitness_values)
