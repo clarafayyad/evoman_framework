@@ -4,7 +4,7 @@ from evoman.environment import Environment
 import time
 import reporting
 import stats
-import operators
+import variation_operators.operators as operators
 
 # Define a set of constants
 POPULATION_SIZE = 100
