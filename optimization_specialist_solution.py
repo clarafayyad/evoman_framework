@@ -22,7 +22,7 @@ env = Environment(experiment_name=experiment,
                   speed="fastest",
                   visuals=False)
 
-is_test = False
+is_test = True
 ini_time = reporting.start_experiment(experiment, is_test)
 
 if is_test:
