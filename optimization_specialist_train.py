@@ -1,4 +1,5 @@
 # imports
+import optimization_specialist_test
 from demo_controller import player_controller
 from evoman.environment import Environment
 import time
@@ -8,7 +9,7 @@ import operators
 
 # Define a set of constants
 POPULATION_SIZE = 100
-TOTAL_GENERATIONS = 50
+TOTAL_GENERATIONS = 10
 
 # Set EA Operators Parameters
 lower_bound = -1
@@ -21,9 +22,8 @@ selection_pressure = 1.2
 # NN configuration
 hidden_neurons = 10
 
-# Start experiment
+# Set experiment name
 experiment = 'experiments'
-ini_time = reporting.start_experiment(experiment)
 
 # Initialize simulation
 env = Environment(experiment_name=experiment,
@@ -34,6 +34,13 @@ env = Environment(experiment_name=experiment,
                   level=2,
                   speed="fastest",
                   visuals=False)
+
+# Start experiment
+is_test = False
+ini_time = reporting.start_experiment(experiment, is_test)
+if is_test:
+    optimization_specialist_test.test_experiment(experiment, env)
+
 
 # Compute individual size
 individual_size = (env.get_num_sensors()+1)*hidden_neurons + (hidden_neurons+1)*5

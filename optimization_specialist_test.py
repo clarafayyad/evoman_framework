@@ -2,11 +2,13 @@
 import numpy as np
 import sys
 
+import operators
+
 
 # loads file with the best solution for testing
-def test(experiment_name, env, evaluate):
+def test_experiment(experiment_name, env):
     best_solution = np.loadtxt(experiment_name + '/best.txt')
     print('\n RUNNING SAVED BEST SOLUTION \n')
     env.update_parameter('speed', 'normal')
-    evaluate([best_solution])
+    operators.evaluate_population(env, [best_solution])
     sys.exit(0)

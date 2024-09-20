@@ -36,10 +36,11 @@ def save_best_individual(experiment_name, best_individual):
     np.savetxt(experiment_name + '/best.txt', best_individual)
 
 
-def start_experiment(experiment_name):
+def start_experiment(experiment_name, is_test=False):
     print('\nEXPERIMENT STARTED\n')
-    create_logs_directory(experiment_name)
-    clear_experiment_logs(experiment_name)
+    if not is_test:
+        create_logs_directory(experiment_name)
+        clear_experiment_logs(experiment_name)
     ini_time = time.time()
     return ini_time
 
