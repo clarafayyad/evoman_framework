@@ -18,94 +18,117 @@ def initialize_population(population_size, individual_size, lower_bound, upper_b
     return np.random.uniform(lower_bound, upper_bound, (population_size, individual_size))
 
 
-def fitness(env, x):
-    f, p, e, t = env.play(pcont=x)
-    return f
-
-
-def tournament(population, k, env):
+def evaluate_individual(env, individual):
     """
-       Perform tournament selection to choose the best individual from a random subset of the population.
-
-       Parameters:
-       population: A 2D array where each row is an individual in the population.
-       k (int): The number of individuals to randomly sample from the population for the tournament.
-       env: The game environment used to evaluate the fitness of each individual.
-
-       Returns:
-       numpy array: The individual with the highest fitness from the selected subset.
-       """
-
-    selected_individuals = random.sample(population.tolist(), k)
-
-    # Find the best individual among the selected based on fitness
-    best_individual = max(selected_individuals, key=lambda ind: fitness(env, ind))
-
-    return best_individual
+     Evaluate an individual given an environment.
+    :param env: Simulation Environment.
+    :param individual: Numpy array of floats representing the individual.
+    :return: float: Fitness value of the individual.
+    """
+    fitness, _, _, _ = env.play(pcont=individual)
+    return fitness
 
 
-def parent_selection(population, k, env):
-    p1 = tournament(population, k, env)
-    p2 = tournament(population, k, env)
-    return p1, p2
+def evaluate_population(env, population):
+    """
+    Evaluate a population given an environment.
+    :param env: Simulation Environment
+    :param population: 2D numpy array representing individuals in a population.
+    :return: A numpy array representing the fitness values.
+    """
+    return np.array(list(map(lambda y: evaluate_individual(env, y), population)))
+
+
+def tournament(population, fitness_values, tournament_size):
+    """
+    Perform tournament selection to choose the best individual from a random subset of the population.
+    :param population: A 2D array where each row is an individual in the population.
+    :param fitness_values: Precomputed fitness values for each individual.
+    :param tournament_size: The number of individuals to randomly sample from the population for the tournament.
+    :return: numpy array: The individual with the highest fitness from the selected subset.
+    """
+
+    # Randomly sample k indices from the population
+    selected_indices = random.sample(range(len(population)), tournament_size)
+
+    # Find the index of the individual with the highest fitness in the selected subset
+    best_index = max(selected_indices, key=lambda idx: fitness_values[idx])
+
+    # Return the individual with the highest fitness
+    return population[best_index]
+
+
+def tournament_parent_selection(population, fitness_values, tournament_size):
+    parent1 = tournament(population, fitness_values, tournament_size)
+    parent2 = tournament(population, fitness_values, tournament_size)
+    return parent1, parent2
 
 
 # Updates the population by selecting survivors.
-def survivor_selection(original_population, offspring, fitness_values, env, s=1.5):
-    # Add child to population and fitness
-    population = np.concatenate((original_population, offspring))
-    fitness_values = np.append(fitness_values, evaluate(env, offspring))
-
-    # Order population and fitness from best to worst
-    sorted_indices = np.argsort(fitness_values)[::-1]
-    sorted_population = population[sorted_indices]
-    sorted_fitness = fitness_values[sorted_indices]
-
-    # Selection based on linear rank
-    mu = len(sorted_fitness)
-    ranks = np.arange(mu)
-    rank_probabilities = ((2 - s) / mu) + ((2 * ranks * (s - 1)) / (mu * (mu - 1)))
-    rank_probabilities /= rank_probabilities.sum()
-
-    selection = np.random.choice(mu, len(original_population), p=rank_probabilities, replace=False)
-
-    # Elitism (preserves fittest individual)
-    fittest_individual = np.argmax(fitness_values)
-    if fittest_individual not in selection:
-        selection[-1] = fittest_individual
-
-    # Establish new population and fitness values
-    new_population = sorted_population[selection]
-    new_fitness_values = sorted_fitness[selection]
-
-    return new_population, new_fitness_values
-
-
-def simulation(env, x):
-    f, p, e, t = env.play(pcont=x)
-    return f
-
-
-def evaluate(env, population):
-    return np.array(list(map(lambda y: simulation(env, y), population)))
-
-
-def crossover(env, population, tournament_count, tournament_size):
+def linear_ranking_survivor_selection(original_population, pop_fitness, offspring, offspring_fitness, s=1.5):
     """
-        Apply random arithmetic crossover to create two children from two parents.
+    Perform survivor selection using linear ranking with elitism.
+    :param original_population: A 2D array where each row is an individual in the original population.
+    :param pop_fitness: A 1D array of fitness values for the original population.
+    :param offspring: A 2D array where each row is an individual from the offspring.
+    :param offspring_fitness: A 1D array of fitness values for the offspring.
+    :param s: Selective pressure parameter (1 < s <= 2), used for linear ranking.
+    :return: 2 numpy arrays: The new population after survivor selection, and the corresponding fitness values.
+    """
 
-        Args:
-        - parent1: A numpy array of the first parent's parameters.
-        - parent2: A numpy array of the second parent's parameters.
+    # Concatenate original population with offspring
+    combined_population = np.concatenate((original_population, offspring), axis=0)
+    combined_fitness = np.concatenate((pop_fitness, offspring_fitness), axis=0)
 
-        Returns:
-        - offspring: A numpy array of the children's parameters.'
-        """
+    # Find the elite individual and its index
+    elite_index = np.argmax(combined_fitness)
+    elite_individual = combined_population[elite_index]
+    elite_fitness = combined_fitness[elite_index]
+
+    # Remove the elite individual from the combined population and fitness
+    combined_population = np.delete(combined_population, elite_index, axis=0)
+    combined_fitness = np.delete(combined_fitness, elite_index)
+
+    # Sort remaining individuals by fitness to prepare for ranking
+    sorted_indices = np.argsort(combined_fitness)
+    sorted_population = combined_population[sorted_indices]
+    sorted_fitness = combined_fitness[sorted_indices]
+
+    # Linear ranking probabilities
+    n = len(sorted_population)
+    ranks = np.arange(1, n + 1)  # Rank from 1 to n
+    probabilities = (2 - s) / n + (2 * ranks * (s - 1)) / (n * (n - 1))
+    probabilities /= np.sum(probabilities)  # Normalize the probabilities to sum to 1
+
+    # Add the elite individual to the new population
+    new_population = [elite_individual]
+    new_fitness_values = [elite_fitness]
+
+    # Select the remaining individuals based on linear ranking probabilities
+    selection_size = len(original_population) - 1
+    selected_indices = np.random.choice(np.arange(n), size=selection_size, replace=False, p=probabilities)
+
+    # Add the selected individuals and their fitness values to the new population
+    new_population.extend(sorted_population[selected_indices])
+    new_fitness_values.extend(sorted_fitness[selected_indices])
+
+    return np.array(new_population), np.array(new_fitness_values)
+
+
+def random_arithmetic_crossover(population, fitness_values, tournament_count, tournament_size):
+    """
+    Apply random arithmetic crossover to create offspring.
+    :param population: Numpy array representing the population.
+    :param fitness_values: Numpy array representing the fitness values.
+    :param tournament_count: Number of rounds to crossover.
+    :param tournament_size: Number of individuals to randomly sample from the population for each tournament.
+    :return: Numpy array representing the offspring.
+    """
 
     offspring = []
 
     for j in range(tournament_count):
-        parent1, parent2 = parent_selection(population, tournament_size, env)
+        parent1, parent2 = tournament_parent_selection(population, fitness_values, tournament_size)
 
         # Initialize children
         child1 = np.zeros_like(parent1)
@@ -123,18 +146,14 @@ def crossover(env, population, tournament_count, tournament_size):
     return np.array(offspring)
 
 
-def mutate(child, rate=0.1, sigma=0.1):
+def gaussian_mutation(child, rate=0.1, sigma=0.1):
     """
-        Apply Gaussian mutation to neural network parameters.
-
-        Args:
-        - child: A numpy array of the neural network parameters.
-        - rate: The probability of mutating each parameter.
-        - sigma: Standard deviation of the Gaussian distribution for mutation.
-
-        Returns:
-        - mutated_child: A numpy array with mutated parameters.
-        """
+    Apply gaussian mutation.
+    :param child: A numpy array representing the child individual.
+    :param rate: The probability that the child individual will be mutated.
+    :param sigma: Standard deviation of the gaussian distribution for mutation.
+    :return: A numpy array representing the mutated child individual.
+    """
 
     mutated_child = np.copy(child)
 
