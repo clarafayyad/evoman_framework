@@ -30,4 +30,4 @@ if is_test:
 else:
     optimization_specialist_train.train_experiment(experiment, env, hidden_neurons)
 
-reporting.log_execution_time(time.time() - ini_time)
+reporting.end_experiment(time.time() - ini_time)
