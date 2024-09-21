@@ -24,11 +24,15 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
 
     # Log to file
     results_file = open(experiment_name + '/results.txt', 'a')
-    results_file.write('\n\ngen best mean std')
+
+    if generation_number == 0:
+        results_file.write('\n\ngen best mean std')
+
     results_file.write('\n' + str(generation_number)
                        + ' ' + str(round(max_fitness, 6))
                        + ' ' + str(round(mean, 6))
                        + ' ' + str(round(std, 6)))
+
     results_file.close()
 
 
