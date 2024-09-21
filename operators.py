@@ -64,7 +64,6 @@ def tournament_parent_selection(population, fitness_values, tournament_size):
     return parent1, parent2
 
 
-# Updates the population by selecting survivors.
 def linear_ranking_survivor_selection(original_population, pop_fitness, offspring, offspring_fitness, s=1.5):
     """
     Perform survivor selection using linear ranking with elitism.
@@ -131,13 +130,15 @@ def clamp_within_bounds(values, lower_bound, upper_bound):
     return values
 
 
-def random_arithmetic_crossover(population, fitness_values, tournament_count, tournament_size):
+def arithmetic_uniform_crossover(population, fitness_values, tournament_count, tournament_size, alpha, rate):
     """
     Apply random arithmetic crossover to create offspring.
     :param population: Numpy array representing the population.
     :param fitness_values: Numpy array representing the fitness values.
     :param tournament_count: Number of rounds to crossover.
     :param tournament_size: Number of individuals to randomly sample from the population for each tournament.
+    :param alpha: The weight used for the arithmetic crossover.
+    :param rate: The probability to swap genes between children, used for uniform crossover.
     :return: Numpy array representing the offspring.
     """
 
@@ -152,9 +153,12 @@ def random_arithmetic_crossover(population, fitness_values, tournament_count, to
 
         # Generate crossover
         for i in range(len(parent1)):
-            alpha = np.random.rand()  # Random weight between 0 and 1
             child1[i] = alpha * parent1[i] + (1 - alpha) * parent2[i]
             child2[i] = (1 - alpha) * parent1[i] + alpha * parent2[i]
+
+            # Apply uniform crossover
+            if np.random.rand() < rate:
+                child1[i], child2[i] = child2[i], child1[i]
 
         offspring.append(child1)
         offspring.append(child2)
@@ -178,3 +182,54 @@ def gaussian_mutation(child, rate=0.1, sigma=0.1):
             mutated_child[i] += mutated_child[i] + np.random.normal(0, sigma)
 
     return mutated_child
+
+
+def fitness_sharing(population, pop_fitness, offspring, offspring_fitness, sigma_share):
+    """
+    Applies fitness sharing to the combined population of parents and offspring.
+    :param population: 2D Numpy array representing the current population.
+    :param pop_fitness: Numpy array of shape representing the fitness values of the population.
+    :param offspring: 2D Numpy array representing the offspring.
+    :param offspring_fitness: Numpy array representing the fitness values of the offspring.
+    :param sigma_share: Float value representing the niche radius.
+    :return:
+        - shared_fitness_population: Numpy array representing the shared fitness values of the population.
+        - shared_fitness_offspring: Numpy array representing the shared fitness values of the offspring.
+    """
+
+    # Combine parents and offspring into a single population
+    combined_population = np.vstack((population, offspring))
+    combined_fitness = np.concatenate((pop_fitness, offspring_fitness))
+
+    shared_fitness = np.copy(combined_fitness)
+    n = len(combined_population)
+
+    for i in range(n):
+        sharing_sum = 0.0
+
+        for j in range(n):
+            if i != j:
+                distance = np.linalg.norm(combined_population[i] - combined_population[j])
+                sharing_value = sharing_function(distance, sigma_share)
+                sharing_sum += sharing_value
+
+        if sharing_sum > 0:
+            shared_fitness[i] = combined_fitness[i] / sharing_sum
+
+    shared_fitness_population = shared_fitness[:len(population)]
+    shared_fitness_offspring = shared_fitness[len(population):]
+
+    return shared_fitness_population, shared_fitness_offspring
+
+
+def sharing_function(distance, sigma_share):
+    """
+    Sharing function based on distance between individuals.
+    :param distance: The distance between two individuals.
+    :param sigma_share: The niche radius.
+    :return: Sharing value (between 0 and 1).
+    """
+    if distance < sigma_share:
+        return 1 - (distance / sigma_share)
+    else:
+        return 0.0

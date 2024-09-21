@@ -12,9 +12,12 @@ TOTAL_GENERATIONS = 30
 lower_bound = -1
 upper_bound = 1
 tournament_size = 5
-mutation_rate = 0.2
-mutation_sigma = 0.1
-selection_pressure = 1.2
+mutation_rate = 0.3
+mutation_sigma = 0.3
+selection_pressure = 1
+crossover_weight = 0.8
+crossover_rate = 0.5
+sigma_share = 0.8  # niche radius
 
 
 def train_experiment(experiment, env, hidden_neurons):
@@ -45,7 +48,14 @@ def train_experiment(experiment, env, hidden_neurons):
 
         # Create offspring
         tournament_count = int(POPULATION_SIZE / 2)
-        offspring = operators.random_arithmetic_crossover(population, fitness_values, tournament_count, tournament_size)
+        offspring = operators.arithmetic_uniform_crossover(
+            population,
+            fitness_values,
+            tournament_count,
+            tournament_size,
+            crossover_weight,
+            crossover_rate,
+        )
 
         # Mutate offspring
         for i in range(len(offspring)):
@@ -56,6 +66,15 @@ def train_experiment(experiment, env, hidden_neurons):
 
         # Evaluate offspring
         offspring_fitness = operators.evaluate_population(env, offspring)
+
+        # Apply fitness sharing
+        # fitness_values, offspring_fitness = operators.fitness_sharing(
+        #     population,
+        #     fitness_values,
+        #     offspring,
+        #     offspring_fitness,
+        #     sigma_share
+        # )
 
         # Survivor selection
         population, fitness_values = operators.linear_ranking_survivor_selection(
