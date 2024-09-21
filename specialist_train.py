@@ -49,10 +49,9 @@ def train_experiment(experiment, env, hidden_neurons):
 
         # Mutate offspring
         for i in range(len(offspring)):
-            # Clamp the weights and biases within the initial range after arithmetic crossover
-            operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
             # Apply gaussian mutation
             offspring[i] = operators.gaussian_mutation(offspring[i], rate=mutation_rate, sigma=mutation_sigma)
+            # Clamp the weights and biases within the initial range after applying variation operators
             operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
 
         # Evaluate offspring
