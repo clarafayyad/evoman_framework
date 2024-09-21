@@ -17,6 +17,7 @@ mutation_sigma = 0.3
 selection_pressure = 1
 crossover_weight = 0.8
 crossover_rate = 0.5
+sigma_share = 0.8  # niche radius
 
 
 def train_experiment(experiment, env, hidden_neurons):
@@ -65,6 +66,15 @@ def train_experiment(experiment, env, hidden_neurons):
 
         # Evaluate offspring
         offspring_fitness = operators.evaluate_population(env, offspring)
+
+        # Apply fitness sharing
+        # fitness_values, offspring_fitness = operators.fitness_sharing(
+        #     population,
+        #     fitness_values,
+        #     offspring,
+        #     offspring_fitness,
+        #     sigma_share
+        # )
 
         # Survivor selection
         population, fitness_values = operators.linear_ranking_survivor_selection(
