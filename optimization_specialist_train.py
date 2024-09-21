@@ -21,7 +21,7 @@ def train_experiment(experiment, env, hidden_neurons):
     individual_size = (env.get_num_sensors() + 1) * hidden_neurons + (hidden_neurons + 1) * 5
 
     # Log the environment state
-    env.state_to_log()
+    # env.state_to_log()
 
     # Initialize generation counter
     generation_number = 0
@@ -39,6 +39,9 @@ def train_experiment(experiment, env, hidden_neurons):
 
     # Evolution
     while generation_number < TOTAL_GENERATIONS:
+        # Increment generation number
+        generation_number += 1
+
         # Create offspring
         tournament_count = int(POPULATION_SIZE / 2)
         offspring = operators.random_arithmetic_crossover(population, fitness_values, tournament_count, tournament_size)
@@ -68,6 +71,4 @@ def train_experiment(experiment, env, hidden_neurons):
         # Update and save simulation state
         env.update_solutions([population, fitness_values])
         env.save_state()
-
-        generation_number += 1
 
