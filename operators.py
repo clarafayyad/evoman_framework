@@ -131,13 +131,15 @@ def clamp_within_bounds(values, lower_bound, upper_bound):
     return values
 
 
-def random_arithmetic_crossover(population, fitness_values, tournament_count, tournament_size):
+def arithmetic_uniform_crossover(population, fitness_values, tournament_count, tournament_size, alpha, rate):
     """
     Apply random arithmetic crossover to create offspring.
     :param population: Numpy array representing the population.
     :param fitness_values: Numpy array representing the fitness values.
     :param tournament_count: Number of rounds to crossover.
     :param tournament_size: Number of individuals to randomly sample from the population for each tournament.
+    :param alpha: The weight used for the arithmetic crossover.
+    :param rate: The probability to swap genes between children, used for uniform crossover.
     :return: Numpy array representing the offspring.
     """
 
@@ -152,9 +154,12 @@ def random_arithmetic_crossover(population, fitness_values, tournament_count, to
 
         # Generate crossover
         for i in range(len(parent1)):
-            alpha = np.random.rand()  # Random weight between 0 and 1
             child1[i] = alpha * parent1[i] + (1 - alpha) * parent2[i]
             child2[i] = (1 - alpha) * parent1[i] + alpha * parent2[i]
+
+            # Apply uniform crossover
+            if np.random.rand() < rate:
+                child1[i], child2[i] = child2[i], child1[i]
 
         offspring.append(child1)
         offspring.append(child2)
