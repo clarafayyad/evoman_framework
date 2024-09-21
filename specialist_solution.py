@@ -1,9 +1,9 @@
 # imports
-import optimization_specialist_test
-import optimization_specialist_train
+from specialist_test import test_experiment
+from specialist_train import train_experiment
 from demo_controller import player_controller
 from evoman.environment import Environment
-import reporting
+from reporting import start_experiment, end_experiment
 import time
 
 # NN configuration
@@ -23,11 +23,11 @@ env = Environment(experiment_name=experiment,
                   visuals=False)
 
 is_test = True
-ini_time = reporting.start_experiment(experiment, is_test)
+ini_time = start_experiment(experiment, is_test)
 
 if is_test:
-    optimization_specialist_test.test_experiment(experiment, env)
+    test_experiment(experiment, env)
 else:
-    optimization_specialist_train.train_experiment(experiment, env, hidden_neurons)
+    train_experiment(experiment, env, hidden_neurons)
 
-reporting.end_experiment(time.time() - ini_time)
+end_experiment(time.time() - ini_time)
