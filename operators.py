@@ -64,7 +64,6 @@ def tournament_parent_selection(population, fitness_values, tournament_size):
     return parent1, parent2
 
 
-# Updates the population by selecting survivors.
 def linear_ranking_survivor_selection(original_population, pop_fitness, offspring, offspring_fitness, s=1.5):
     """
     Perform survivor selection using linear ranking with elitism.
