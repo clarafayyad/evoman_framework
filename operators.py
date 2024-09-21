@@ -115,6 +115,22 @@ def linear_ranking_survivor_selection(original_population, pop_fitness, offsprin
     return np.array(new_population), np.array(new_fitness_values)
 
 
+def clamp_within_bounds(values, lower_bound, upper_bound):
+    """
+    Clamp the values within a certain range.
+    :param values: Numpy array of floats representing the values.
+    :param lower_bound: The minimum allowable value.
+    :param upper_bound: The maximum allowable value.
+    :return: Numpy array of floats representing the clamped values.
+    """
+    for i in range(len(values)):
+        if values[i] > upper_bound:
+            values[i] = upper_bound
+        if values[i] < lower_bound:
+            values[i] = lower_bound
+    return values
+
+
 def random_arithmetic_crossover(population, fitness_values, tournament_count, tournament_size):
     """
     Apply random arithmetic crossover to create offspring.

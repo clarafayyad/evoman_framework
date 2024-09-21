@@ -1,4 +1,5 @@
 # imports
+import numpy as np
 import reporting
 import stats
 import operators
@@ -48,7 +49,10 @@ def train_experiment(experiment, env, hidden_neurons):
 
         # Mutate offspring
         for i in range(len(offspring)):
+            # Apply gaussian mutation
             offspring[i] = operators.gaussian_mutation(offspring[i], rate=mutation_rate, sigma=mutation_sigma)
+            # Clamp the weights and biases within the initial range after applying variation operators
+            operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
 
         # Evaluate offspring
         offspring_fitness = operators.evaluate_population(env, offspring)
