@@ -11,6 +11,7 @@ hidden_neurons = 10
 
 # Set experiment name
 experiment = 'experiments'
+is_test = False
 
 # Initialize simulation
 env = Environment(experiment_name=experiment,
@@ -20,9 +21,9 @@ env = Environment(experiment_name=experiment,
                   enemymode="static",
                   level=2,
                   speed="fastest",
-                  visuals=False)
+                  visuals=is_test)
 
-is_test = True
+
 ini_time = start_experiment(experiment, is_test)
 
 if is_test:

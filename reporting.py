@@ -23,7 +23,7 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
           + ' ' + str(round(std, 6)))
 
     # Log to file
-    results_file = open(experiment_name + '/results.txt', 'a')
+    results_file = open(experiment_name + '/train_results.txt', 'a')
 
     if generation_number == 0:
         results_file.write('\n\ngen best mean std')
@@ -70,3 +70,12 @@ def create_logs_directory(experiment_name):
     if not os.path.exists('./' + experiment_name):
         os.makedirs('./' + experiment_name)
 
+
+def log_test_results(experiment_name, fitness, player_life, enemy_life, time):
+    results_file = open(experiment_name + '/test_tesults.txt', 'a')
+    results_file.write('\n\nfitness, player_life, enemy_life, time')
+    results_file.write('\n' + str(round(fitness, 6))
+                       + ' ' + str(round(player_life, 6))
+                       + ' ' + str(round(enemy_life, 6))
+                       + ' ' + str(round(time, 6)))
+    results_file.close()
