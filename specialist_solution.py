@@ -1,7 +1,7 @@
 # imports
 from specialist_test import test_experiment
 from specialist_train import train_experiment
-from demo_controller import player_controller
+from demos.demo_controller import player_controller
 from evoman.environment import Environment
 from reporting import start_experiment, end_experiment
 import time
