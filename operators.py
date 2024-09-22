@@ -89,7 +89,7 @@ def linear_ranking_survivor_selection(original_population, pop_fitness, offsprin
     combined_fitness = np.delete(combined_fitness, elite_index)
 
     # Sort remaining individuals by fitness to prepare for ranking
-    sorted_indices = np.argsort(combined_fitness)
+    sorted_indices = np.argsort(-combined_fitness)
     sorted_population = combined_population[sorted_indices]
     sorted_fitness = combined_fitness[sorted_indices]
 
