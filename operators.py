@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def initialize_population(population_size, individual_size, lower_bound, upper_bound):
+def initialize_population(population_size, individual_size, lower_bound=-1, upper_bound=1):
     """
     Initializes a random population with individuals represented as arrays of floats.
 
