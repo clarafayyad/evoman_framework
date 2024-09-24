@@ -72,6 +72,16 @@ def create_logs_directory(experiment_name):
 
 
 def log_test_results(experiment_name, fitness, player_life, enemy_life, time):
+    print(f"\nPlayer Life: {player_life}")
+    print(f"Enemy Life: {enemy_life}")
+    print(f"Time: {time}")
+    if enemy_life > player_life :
+        print("Result: Player Lost!")
+    elif player_life > enemy_life:
+        print("Result: Player Won!")
+    else:
+        print("Result: It's a Draw!")
+
     results_file = open(experiment_name + '/test_tesults.txt', 'a')
     results_file.write('\n\nfitness, player_life, enemy_life, time')
     results_file.write('\n' + str(round(fitness, 6))

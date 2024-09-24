@@ -12,7 +12,7 @@ hidden_neurons = 10
 
 # Set experiment name
 experiment = 'experiments'
-is_test = False
+is_test = True
 apply_coevolution = True
 
 # Initialize simulation
@@ -32,7 +32,7 @@ if is_test:
     test_experiment(experiment, env)
 else:
     if apply_coevolution:
-        coevolution.cooperative_coevolution(env, hidden_neurons)
+        coevolution.cooperative_coevolution(experiment, env, hidden_neurons)
     else:
         train_experiment(experiment, env, hidden_neurons)
 

@@ -1,6 +1,8 @@
 import numpy as np
 import operators
 import parameters
+import reporting
+import stats
 
 FEATURES_POP = 'input_to_hidden'
 WALK_LEFT_POP = 'walk left'
@@ -97,7 +99,7 @@ def initialize_random_sub_population(identifier, individual_size):
     ))
 
 
-def cooperative_coevolution(env, hidden_neurons):
+def cooperative_coevolution(experiment, env, hidden_neurons):
     input_to_hidden_size = (env.get_num_sensors() + 1) * hidden_neurons
     hidden_to_output_size = hidden_neurons + 1
 
@@ -112,9 +114,12 @@ def cooperative_coevolution(env, hidden_neurons):
     subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
     subpopulations_len = len(subpopulations)
 
-    # Evolve subpopulations
+    best_individual_found = None
+    best_fitness_found = 0
+
+    # Co-evolution
     for generation in range(parameters.TOTAL_GENERATIONS):
-        print('Generation {}'.format(generation))
+        # Evolve each subpopulation
         for i in range(subpopulations_len):
             # Get the best individuals from other subpopulations
             other_best_subnetworks = {}
@@ -123,7 +128,18 @@ def cooperative_coevolution(env, hidden_neurons):
                     other_best_subnetworks[subpopulations[j].identifier] = subpopulations[j].best_individual
             subpopulations[i].evolve(env, other_best_subnetworks)
 
-    # Create final best network out of subpopulations
-    best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
-    best_fitness = operators.evaluate_individual(env, best_network)
-    print('Best fitness: {}'.format(best_fitness))
+        # Create best network out of subpopulations
+        current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
+        current_best_fitness = operators.evaluate_individual(env, current_best_network)
+        reporting.log_stats(experiment, generation, current_best_fitness, 0, 0)
+
+        if current_best_fitness > best_fitness_found:
+            best_individual_found = current_best_network
+            best_fitness_found = current_best_fitness
+
+    reporting.save_best_individual(experiment, best_individual_found)
+
+
+
+
+
