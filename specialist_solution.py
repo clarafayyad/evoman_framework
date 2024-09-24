@@ -1,4 +1,5 @@
 # imports
+import coevolution
 from specialist_test import test_experiment
 from specialist_train import train_experiment
 from demos.demo_controller import player_controller
@@ -12,6 +13,7 @@ hidden_neurons = 10
 # Set experiment name
 experiment = 'experiments'
 is_test = False
+apply_coevolution = True
 
 # Initialize simulation
 env = Environment(experiment_name=experiment,
@@ -29,6 +31,9 @@ ini_time = start_experiment(experiment, is_test)
 if is_test:
     test_experiment(experiment, env)
 else:
-    train_experiment(experiment, env, hidden_neurons)
+    if apply_coevolution:
+        coevolution.cooperative_coevolution(env, hidden_neurons)
+    else:
+        train_experiment(experiment, env, hidden_neurons)
 
 end_experiment(time.time() - ini_time)
