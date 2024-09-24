@@ -21,11 +21,6 @@ class Subpopulation:
         self.identifier = identifier
 
     def evaluate(self, env, other_best_subnetworks):
-        """
-        Evaluate each individual in this subpopulation.
-        other_best_subnetworks: list of the best individuals from other subpopulations.
-        evaluate_fn: function to evaluate the combined full network in the game.
-        """
         for i, individual in enumerate(self.individuals):
             # Combine current individual with the best individuals from the other subnetworks
             full_network = combine_subnetworks(self.identifier, individual, other_best_subnetworks)
