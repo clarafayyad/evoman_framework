@@ -1,5 +1,4 @@
 # imports
-import numpy as np
 import reporting
 import stats
 import operators
