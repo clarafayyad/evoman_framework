@@ -62,6 +62,17 @@ class Subpopulation:
         offspring_sub_pop = Subpopulation(self.identifier, offspring)
         offspring_sub_pop.evaluate(env, other_best_subnetworks)
 
+        # Apply fitness sharing
+        # fitness, offspring_fitness = operators.fitness_sharing(
+        #     self.individuals,
+        #     self.fitness,
+        #     offspring_sub_pop.individuals,
+        #     offspring_sub_pop.fitness,
+        #     parameters.sigma_share
+        # )
+        # self.fitness = fitness
+        # offspring_sub_pop.fitness = offspring_fitness
+
         # Survivor selection
         selected_individuals, selected_fitness_values = operators.linear_ranking_survivor_selection(
             self.individuals,
@@ -139,7 +150,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
             best_individual_found = current_best_network
             best_fitness_found = current_best_fitness
 
-    reporting.save_best_individual(experiment, best_individual_found)
+    reporting.save_best_individual(experiment, best_individual_found, best_fitness_found)
 
 
 
