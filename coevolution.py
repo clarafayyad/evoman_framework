@@ -1,9 +1,23 @@
 import numpy as np
 import operators
-import parameters
 import reporting
-import stats
 
+# Define a set of constants
+POPULATION_SIZE = 100
+TOTAL_GENERATIONS = 10
+
+# Set EA Operators Parameters
+lower_bound = -1
+upper_bound = 1
+tournament_size = 5
+mutation_rate = 0.3
+mutation_sigma = 0.3
+selection_pressure = 1
+crossover_weight = 0.8
+crossover_rate = 0.5
+sigma_share = 0.8  # niche radius
+
+# Define subnetworks
 FEATURES_POP = 'input_to_hidden'
 WALK_LEFT_POP = 'walk left'
 WALK_RIGHT_POP = 'walk right'
@@ -42,9 +56,9 @@ class Subpopulation:
             self.individuals,
             self.fitness,
             tournament_count,
-            parameters.tournament_size,
-            parameters.crossover_weight,
-            parameters.crossover_rate,
+            tournament_size,
+            crossover_weight,
+            crossover_rate,
         )
 
         # Mutate offspring
@@ -52,11 +66,11 @@ class Subpopulation:
             # Apply gaussian mutation
             offspring[i] = operators.gaussian_mutation(
                 offspring[i],
-                rate=parameters.mutation_rate,
-                sigma=parameters.mutation_sigma
+                rate=mutation_rate,
+                sigma=mutation_sigma
             )
             # Clamp the weights and biases within the initial range after applying variation operators
-            operators.clamp_within_bounds(offspring[i], parameters.lower_bound, parameters.upper_bound)
+            operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
 
         # Evaluate offspring
         offspring_sub_pop = Subpopulation(self.identifier, offspring)
@@ -79,7 +93,7 @@ class Subpopulation:
             self.fitness,
             offspring_sub_pop.individuals,
             offspring_sub_pop.fitness,
-            s=parameters.selection_pressure
+            s=selection_pressure
         )
 
         self.individuals = selected_individuals
@@ -103,10 +117,10 @@ def combine_subnetworks(current_pop_id, current_individual, other_best_subnetwor
 
 def initialize_random_sub_population(identifier, individual_size):
     return Subpopulation(identifier, operators.initialize_population(
-        parameters.POPULATION_SIZE,
+        POPULATION_SIZE,
         individual_size,
-        parameters.lower_bound,
-        parameters.upper_bound
+        lower_bound,
+        upper_bound
     ))
 
 
@@ -129,7 +143,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
     best_fitness_found = 0
 
     # Co-evolution
-    for generation in range(parameters.TOTAL_GENERATIONS):
+    for generation in range(TOTAL_GENERATIONS):
         # Evolve each subpopulation
         for i in range(subpopulations_len):
             # Get the best individuals from the other subpopulations
