@@ -1,3 +1,4 @@
+import csv
 import time
 import numpy as np
 import os
@@ -23,17 +24,12 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
           + ' ' + str(round(std, 6)))
 
     # Log to file
-    results_file = open(experiment_name + '/train_results.txt', 'a')
-
-    if generation_number == 0:
-        results_file.write('\n\ngen best mean std')
-
-    results_file.write('\n' + str(generation_number)
-                       + ' ' + str(round(max_fitness, 6))
-                       + ' ' + str(round(mean, 6))
-                       + ' ' + str(round(std, 6)))
-
-    results_file.close()
+    results_file_path = os.path.join(experiment_name, 'train_results.csv')
+    with open(results_file_path, mode='a', newline='') as results_file:
+        results_writer = csv.writer(results_file)
+        if generation_number == 0:
+            results_writer.writerow(['gen', 'best', 'mean', 'std'])
+        results_writer.writerow([generation_number, round(max_fitness, 6), round(mean, 6), round(std, 6)])
 
 
 def save_best_individual(experiment_name, best_individual, best_fitness):
