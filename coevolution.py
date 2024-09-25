@@ -70,7 +70,7 @@ class Subpopulation:
                 sigma=mutation_sigma
             )
             # Clamp the weights and biases within the initial range after applying variation operators
-            operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
+            offspring[i] = operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
 
         # Evaluate offspring
         offspring_sub_pop = Subpopulation(self.identifier, offspring)
