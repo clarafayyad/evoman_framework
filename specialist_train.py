@@ -89,7 +89,7 @@ def basic_evolution(experiment, env, hidden_neurons):
         reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 
         # Save file with the best solution
-        reporting.save_best_individual(experiment, population[best_individual_index])
+        reporting.save_best_individual(experiment, population[best_individual_index], fitness_values[best_individual_index])
 
         # Update and save simulation state
         env.update_solutions([population, fitness_values])
