@@ -4,7 +4,7 @@ import reporting
 
 # Define a set of constants
 POPULATION_SIZE = 100
-TOTAL_GENERATIONS = 30
+TOTAL_GENERATIONS = 50
 
 # Set EA Operators Parameters
 lower_bound = -1
