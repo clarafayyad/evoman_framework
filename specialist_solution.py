@@ -1,7 +1,7 @@
 # imports
-import coevolution
+from coevolution import cooperative_coevolution
 from specialist_test import test_experiment
-from specialist_train import train_experiment
+from specialist_train import basic_evolution
 from demos.demo_controller import player_controller
 from evoman.environment import Environment
 from reporting import start_experiment, end_experiment
@@ -32,8 +32,8 @@ if is_test:
     test_experiment(experiment, env)
 else:
     if apply_coevolution:
-        coevolution.cooperative_coevolution(experiment, env, hidden_neurons)
+        cooperative_coevolution(experiment, env, hidden_neurons)
     else:
-        train_experiment(experiment, env, hidden_neurons)
+        basic_evolution(experiment, env, hidden_neurons)
 
 end_experiment(time.time() - ini_time)

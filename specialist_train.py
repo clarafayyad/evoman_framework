@@ -20,7 +20,7 @@ crossover_rate = 0.5
 sigma_share = 0.8  # niche radius
 
 
-def train_experiment(experiment, env, hidden_neurons):
+def basic_evolution(experiment, env, hidden_neurons):
     # Compute individual size
     individual_size = (env.get_num_sensors() + 1) * hidden_neurons + (hidden_neurons + 1) * 5
 
