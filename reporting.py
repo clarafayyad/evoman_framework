@@ -36,7 +36,8 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
     results_file.close()
 
 
-def save_best_individual(experiment_name, best_individual):
+def save_best_individual(experiment_name, best_individual, best_fitness):
+    print('\n BEST FITNESS ' + str(best_fitness))
     np.savetxt(experiment_name + '/best.txt', best_individual)
 
 
