@@ -121,11 +121,13 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
     for generation in range(parameters.TOTAL_GENERATIONS):
         # Evolve each subpopulation
         for i in range(subpopulations_len):
-            # Get the best individuals from other subpopulations
+            # Get the best individuals from the other subpopulations
             other_best_subnetworks = {}
             for j in range(subpopulations_len):
                 if j != i:
                     other_best_subnetworks[subpopulations[j].identifier] = subpopulations[j].best_individual
+
+            # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
             subpopulations[i].evolve(env, other_best_subnetworks)
 
         # Create best network out of subpopulations
