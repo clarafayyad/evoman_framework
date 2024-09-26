@@ -9,13 +9,13 @@ TOTAL_GENERATIONS = 50
 # Set EA Operators Parameters
 lower_bound = -1
 upper_bound = 1
-tournament_size = 5
-mutation_rate = 0.6
-mutation_sigma = 0.3
-selection_pressure = 1
+tournament_size = 3
+mutation_rate = 0.8
+mutation_sigma = 0.5
+selection_pressure = 1.1
 crossover_weight = 0.8
-crossover_rate = 0.6
-sigma_share = 0.8  # niche radius
+crossover_rate = 0.8
+# sigma_share = 0.8  # niche radius
 
 # Define subnetworks
 FEATURES_POP = 'input_to_hidden'
