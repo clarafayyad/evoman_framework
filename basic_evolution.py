@@ -97,7 +97,7 @@ def basic_evolution(experiment, env, hidden_neurons):
             if stale_population_count > 10:
                 print('\n INTRODUCING NOISEEEE')
                 stale_population_count = 0
-                population = operators.introduce_noise(population, fitness_values, replacement_rate)
+                population = operators.introduce_random_restarts(population, fitness_values, replacement_rate)
                 fitness_values = operators.evaluate_population(env, population)
 
         reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)

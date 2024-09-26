@@ -235,7 +235,7 @@ def sharing_function(distance, sigma_share):
         return 0.0
 
 
-def introduce_noise(population, fitness_values, replacement_rate):
+def introduce_random_restarts(population, fitness_values, replacement_rate):
     # Find the index of the best individual
     best_idx = np.argmax(fitness_values)
 

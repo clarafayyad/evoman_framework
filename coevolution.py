@@ -172,7 +172,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
                 print('\n INTRODUCING NOISEEEE')
                 stale_population_count = 0
                 for subpop in subpopulations:
-                    subpop.individuals = operators.introduce_noise(
+                    subpop.individuals = operators.introduce_random_restarts(
                         subpop.individuals,
                         subpop.fitness,
                         replacement_rate
