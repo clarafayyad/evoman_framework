@@ -16,7 +16,7 @@ mutation_sigma = 0.3
 selection_pressure = 1.5
 crossover_weight = 0.8
 crossover_rate = 0.6
-sigma_share = 0.8  # niche radius
+# sigma_share = 0.8  # niche radius
 
 
 def basic_evolution(experiment, env, hidden_neurons):
