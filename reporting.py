@@ -31,6 +31,22 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
             results_writer.writerow(['gen', 'best', 'mean', 'std'])
         results_writer.writerow([generation_number, round(max_fitness, 6), round(mean, 6), round(std, 6)])
 
+def log_sub_pop_stats(experiment_name, subpop_identifier, generation_number, max_fitness, mean, std):
+    # Display relevant message
+    print('\n SUBPOP ' + subpop_identifier
+          + '\n ' + str(round(max_fitness, 6))
+          + ' ' + str(round(mean, 6))
+          + ' ' + str(round(std, 6)))
+
+    # Log to file
+    file_name = subpop_identifier + '_train_results.csv'
+    results_file_path = os.path.join(experiment_name, file_name)
+    with open(results_file_path, mode='a', newline='') as results_file:
+        results_writer = csv.writer(results_file)
+        if generation_number == 0:
+            results_writer.writerow(['gen', 'best', 'mean', 'std'])
+        results_writer.writerow([generation_number, round(max_fitness, 6), round(mean, 6), round(std, 6)])
+
 
 def save_best_individual(experiment_name, best_individual, best_fitness):
     print('\n BEST FITNESS ' + str(best_fitness))

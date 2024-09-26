@@ -1,6 +1,7 @@
 import numpy as np
 import operators
 import reporting
+import stats
 
 # Define a set of constants
 POPULATION_SIZE = 100
@@ -19,8 +20,8 @@ crossover_rate = 0.8
 
 # Define subnetworks
 FEATURES_POP = 'input_to_hidden'
-WALK_LEFT_POP = 'walk left'
-WALK_RIGHT_POP = 'walk right'
+WALK_LEFT_POP = 'walk_left'
+WALK_RIGHT_POP = 'walk_right'
 JUMP_POP = 'jump'
 SHOOT_POP = 'shoot'
 RELEASE_POP = 'release'
@@ -46,7 +47,7 @@ class Subpopulation:
         # Find the best individual based on fitness
         self.best_individual = self.individuals[np.argmax(self.fitness)]
 
-    def evolve(self, env, other_best_subnetworks):
+    def evolve(self, env, experiment, generation_number, other_best_subnetworks):
         # Evaluate current subpopulation
         self.evaluate(env, other_best_subnetworks)
 
@@ -100,6 +101,10 @@ class Subpopulation:
         self.fitness = selected_fitness_values
         self.best_individual = self.individuals[np.argmax(self.fitness)]
 
+        # Compute and log stats
+        best_individual_index, mean, std = stats.compute_stats(self.fitness)
+        reporting.log_sub_pop_stats(experiment, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+
 
 def combine_subnetworks(current_pop_id, current_individual, other_best_subnetworks):
     network_order = [FEATURES_POP, WALK_LEFT_POP, WALK_RIGHT_POP, JUMP_POP, SHOOT_POP, RELEASE_POP]
@@ -144,6 +149,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
 
     # Co-evolution
     for generation in range(TOTAL_GENERATIONS):
+        print('\nGENERATION ', generation)
         # Evolve each subpopulation
         for i in range(subpopulations_len):
             # Get the best individuals from the other subpopulations
@@ -153,7 +159,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
                     other_best_subnetworks[subpopulations[j].identifier] = subpopulations[j].best_individual
 
             # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
-            subpopulations[i].evolve(env, other_best_subnetworks)
+            subpopulations[i].evolve(env, experiment, generation, other_best_subnetworks)
 
         # Create best network out of subpopulations
         current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
