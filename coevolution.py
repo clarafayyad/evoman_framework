@@ -3,7 +3,7 @@ import operators
 import reporting
 
 # Define a set of constants
-POPULATION_SIZE = 200
+POPULATION_SIZE = 100
 TOTAL_GENERATIONS = 100
 
 # Set EA Operators Parameters
