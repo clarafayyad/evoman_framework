@@ -235,7 +235,7 @@ def sharing_function(distance, sigma_share):
         return 0.0
 
 
-def introduce_noise(env, population, fitness_values, replacement_rate):
+def introduce_noise(population, fitness_values, replacement_rate):
     # Find the index of the best individual
     best_idx = np.argmax(fitness_values)
 
@@ -253,5 +253,5 @@ def introduce_noise(env, population, fitness_values, replacement_rate):
     for i in replace_indices:
         population[i] = np.random.uniform(low=-1, high=1, size=population[i].shape)
 
-    return population, evaluate_population(env, population)
+    return population
 

@@ -24,9 +24,6 @@ def basic_evolution(experiment, env, hidden_neurons):
     # Compute individual size
     individual_size = (env.get_num_sensors() + 1) * hidden_neurons + (hidden_neurons + 1) * 5
 
-    # Log the environment state
-    # env.state_to_log()
-
     # Initialize generation counter
     generation_number = 0
 
@@ -92,18 +89,16 @@ def basic_evolution(experiment, env, hidden_neurons):
         best_individual_index, mean, std = stats.compute_stats(fitness_values)
 
         # Track and modify stale population
-        if fitness_values[best_individual_index] == best_fitness_found:
-            stale_population_count += 1
+        if fitness_values[best_individual_index] > best_fitness_found:
+            stale_population_count = 0
+            best_fitness_found = fitness_values[best_individual_index]
         else:
-            stale_population_count = 0
-            best_fitness_found = fitness_values[best_individual_index]
-
-        if stale_population_count > 10:
-            print('\n INTRODUCING NOISEEEE')
-            stale_population_count = 0
-            population, fitness_values = operators.introduce_noise(env, population, fitness_values, replacement_rate)
-            best_individual_index, mean, std = stats.compute_stats(fitness_values)
-            best_fitness_found = fitness_values[best_individual_index]
+            stale_population_count += 1
+            if stale_population_count > 10:
+                print('\n INTRODUCING NOISEEEE')
+                stale_population_count = 0
+                population = operators.introduce_noise(population, fitness_values, replacement_rate)
+                fitness_values = operators.evaluate_population(env, population)
 
         reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 

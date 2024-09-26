@@ -3,19 +3,20 @@ import operators
 import reporting
 
 # Define a set of constants
-POPULATION_SIZE = 100
-TOTAL_GENERATIONS = 50
+POPULATION_SIZE = 200
+TOTAL_GENERATIONS = 100
 
 # Set EA Operators Parameters
 lower_bound = -1
 upper_bound = 1
-tournament_size = 5
-mutation_rate = 0.6
+tournament_size = 10
+mutation_rate = 0.7
 mutation_sigma = 0.3
 selection_pressure = 1
 crossover_weight = 0.8
 crossover_rate = 0.6
 sigma_share = 0.8  # niche radius
+replacement_rate = 0.25
 
 # Define subnetworks
 FEATURES_POP = 'input_to_hidden'
@@ -141,6 +142,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
 
     best_individual_found = None
     best_fitness_found = 0
+    stale_population_count = 0
 
     # Co-evolution
     for generation in range(TOTAL_GENERATIONS):
@@ -158,12 +160,27 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
         # Create best network out of subpopulations
         current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
         current_best_fitness = operators.evaluate_individual(env, current_best_network)
-        reporting.log_stats(experiment, generation, current_best_fitness, 0, 0)
 
+        # Track and modify stale population
         if current_best_fitness > best_fitness_found:
+            stale_population_count = 0
             best_individual_found = current_best_network
             best_fitness_found = current_best_fitness
+        else:
+            stale_population_count += 1
+            if stale_population_count > 10:
+                print('\n INTRODUCING NOISEEEE')
+                stale_population_count = 0
+                for subpop in subpopulations:
+                    subpop.individuals = operators.introduce_noise(
+                        subpop.individuals,
+                        subpop.fitness,
+                        replacement_rate
+                    )
 
+        reporting.log_stats(experiment, generation, current_best_fitness, 0, 0)
+
+    # Coevolution done, save best individual
     reporting.save_best_individual(experiment, best_individual_found, best_fitness_found)
 
 
