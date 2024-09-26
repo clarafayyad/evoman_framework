@@ -1,7 +1,7 @@
 # imports
 from coevolution import cooperative_coevolution
-from specialist_test import test_experiment
-from specialist_train import basic_evolution
+from test_solution import test_experiment
+from basic_evolution import basic_evolution
 from demos.demo_controller import player_controller
 from evoman.environment import Environment
 from reporting import start_experiment, end_experiment
@@ -12,12 +12,12 @@ hidden_neurons = 10
 
 # Set experiment name
 experiment = 'experiments'
-is_test = True
+is_test = False
 apply_coevolution = True
 
 # Initialize simulation
 env = Environment(experiment_name=experiment,
-                  enemies=[8],
+                  enemies=[7],
                   playermode="ai",
                   player_controller=player_controller(hidden_neurons),
                   enemymode="static",
