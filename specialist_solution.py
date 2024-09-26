@@ -12,12 +12,12 @@ hidden_neurons = 10
 
 # Set experiment name
 experiment = 'experiments'
-is_test = True
+is_test = False
 apply_coevolution = True
 
 # Initialize simulation
 env = Environment(experiment_name=experiment,
-                  enemies=[8],
+                  enemies=[7],
                   playermode="ai",
                   player_controller=player_controller(hidden_neurons),
                   enemymode="static",
