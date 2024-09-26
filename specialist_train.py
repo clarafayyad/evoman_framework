@@ -4,19 +4,20 @@ import stats
 import operators
 
 # Define a set of constants
-POPULATION_SIZE = 100
-TOTAL_GENERATIONS = 50
+POPULATION_SIZE = 200
+TOTAL_GENERATIONS = 100
 
 # Set EA Operators Parameters
 lower_bound = -1
 upper_bound = 1
-tournament_size = 7
-mutation_rate = 0.6
+tournament_size = 10
+mutation_rate = 0.7
 mutation_sigma = 0.3
 selection_pressure = 1.5
 crossover_weight = 0.8
 crossover_rate = 0.6
 sigma_share = 0.8  # niche radius
+replacement_rate = 0.25
 
 
 def basic_evolution(experiment, env, hidden_neurons):
@@ -39,6 +40,10 @@ def basic_evolution(experiment, env, hidden_neurons):
     # Compute and log stats
     best_individual_index, mean, std = stats.compute_stats(fitness_values)
     reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
+
+    # Keep track of the best fitness value over generations, to introduce noise when there is no progress
+    best_fitness_found = fitness_values[best_individual_index]
+    stale_population_count = 0
 
     # Evolution
     while generation_number < TOTAL_GENERATIONS:
@@ -83,14 +88,29 @@ def basic_evolution(experiment, env, hidden_neurons):
             offspring_fitness,
             s=selection_pressure)
 
-        # Compute and log stats
+        # Compute stats
         best_individual_index, mean, std = stats.compute_stats(fitness_values)
+
+        # Track and modify stale population
+        if fitness_values[best_individual_index] == best_fitness_found:
+            stale_population_count += 1
+        else:
+            stale_population_count = 0
+            best_fitness_found = fitness_values[best_individual_index]
+
+        if stale_population_count > 10:
+            print('\n INTRODUCING NOISEEEE')
+            stale_population_count = 0
+            population, fitness_values = operators.introduce_noise(env, population, fitness_values, replacement_rate)
+            best_individual_index, mean, std = stats.compute_stats(fitness_values)
+            best_fitness_found = fitness_values[best_individual_index]
+
         reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 
-        # Save file with the best solution
-        reporting.save_best_individual(experiment, population[best_individual_index], fitness_values[best_individual_index])
+    # Save file with the best solution
+    reporting.save_best_individual(experiment, population[best_individual_index], fitness_values[best_individual_index])
 
-        # Update and save simulation state
-        env.update_solutions([population, fitness_values])
-        env.save_state()
+    # Update and save simulation state
+    env.update_solutions([population, fitness_values])
+    env.save_state()
 

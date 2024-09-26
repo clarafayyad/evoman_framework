@@ -233,3 +233,25 @@ def sharing_function(distance, sigma_share):
         return 1 - (distance / sigma_share)
     else:
         return 0.0
+
+
+def introduce_noise(env, population, fitness_values, replacement_rate):
+    # Find the index of the best individual
+    best_idx = np.argmax(fitness_values)
+
+    # Determine how many individuals to replace
+    num_to_replace = int(len(population) * replacement_rate)
+
+    # Randomly choose indices to replace (excluding the best individual)
+    replace_indices = np.random.choice(
+        np.delete(np.arange(len(population)), best_idx),
+        size=num_to_replace,
+        replace=False
+    )
+
+    # Replace selected individuals with random ones (same shape as population)
+    for i in replace_indices:
+        population[i] = np.random.uniform(low=-1, high=1, size=population[i].shape)
+
+    return population, evaluate_population(env, population)
+
