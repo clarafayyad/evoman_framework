@@ -1,9 +1,11 @@
 # imports
-from specialist_coevolution import cooperative_coevolution
 from specialist_test import test_experiment
+from specialist_coevolution import cooperative_coevolution
 from specialist_basic_evolution import basic_evolution
+
 from demos.demo_controller import player_controller
 from evoman.environment import Environment
+
 from reporting import start_experiment, end_experiment
 import time
 

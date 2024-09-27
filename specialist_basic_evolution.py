@@ -23,9 +23,6 @@ def basic_evolution(experiment, env, hidden_neurons):
     # Compute individual size
     individual_size = (env.get_num_sensors() + 1) * hidden_neurons + (hidden_neurons + 1) * 5
 
-    # Log the environment state
-    # env.state_to_log()
-
     # Initialize generation counter
     generation_number = 0
 
@@ -87,10 +84,10 @@ def basic_evolution(experiment, env, hidden_neurons):
         best_individual_index, mean, std = stats.compute_stats(fitness_values)
         reporting.log_stats(experiment, generation_number, fitness_values[best_individual_index], mean, std)
 
-        # Save file with the best solution
-        reporting.save_best_individual(experiment, population[best_individual_index], fitness_values[best_individual_index])
+    # Save file with the best solution
+    reporting.save_best_individual(experiment, population[best_individual_index], fitness_values[best_individual_index])
 
-        # Update and save simulation state
-        env.update_solutions([population, fitness_values])
-        env.save_state()
+    # Update and save simulation state
+    env.update_solutions([population, fitness_values])
+    env.save_state()
 

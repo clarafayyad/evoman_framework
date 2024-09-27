@@ -18,7 +18,7 @@ crossover_weight = 0.8
 crossover_rate = 0.8
 # sigma_share = 0.8  # niche radius
 
-# Define subnetworks
+# Define subnetworks identifiers
 FEATURES_POP = 'input_to_hidden'
 WALK_LEFT_POP = 'walk_left'
 WALK_RIGHT_POP = 'walk_right'
@@ -29,26 +29,24 @@ RELEASE_POP = 'release'
 
 class Subpopulation:
     def __init__(self, identifier, individuals):
-        # Initialize with random individuals
+        self.identifier = identifier
         self.individuals = individuals
-        # Store fitness for each individual
         self.fitness = np.zeros(len(individuals))
         # Select a random individual as the initial best individual
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
-        self.identifier = identifier
 
     def evaluate(self, env, other_best_subnetworks):
         for i, individual in enumerate(self.individuals):
             # Combine current individual with the best individuals from the other subnetworks
             full_network = combine_subnetworks(self.identifier, individual, other_best_subnetworks)
-            # Get the fitness from the game simulation
+            # Evaluate full network
             self.fitness[i] = operators.evaluate_individual(env, full_network)
 
         # Find the best individual based on fitness
         self.best_individual = self.individuals[np.argmax(self.fitness)]
 
     def evolve(self, env, experiment, generation_number, other_best_subnetworks):
-        # Evaluate current subpopulation
+        # Evaluate current subnetwork/subpopulation
         self.evaluate(env, other_best_subnetworks)
 
         # Create Offspring
@@ -65,11 +63,7 @@ class Subpopulation:
         # Mutate offspring
         for i in range(len(offspring)):
             # Apply gaussian mutation
-            offspring[i] = operators.gaussian_mutation(
-                offspring[i],
-                rate=mutation_rate,
-                sigma=mutation_sigma
-            )
+            offspring[i] = operators.gaussian_mutation(offspring[i], rate=mutation_rate, sigma=mutation_sigma)
             # Clamp the weights and biases within the initial range after applying variation operators
             offspring[i] = operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
 
@@ -110,6 +104,7 @@ def combine_subnetworks(current_pop_id, current_individual, other_best_subnetwor
     network_order = [FEATURES_POP, WALK_LEFT_POP, WALK_RIGHT_POP, JUMP_POP, SHOOT_POP, RELEASE_POP]
 
     network_parts = {current_pop_id: current_individual}
+
     for identifier, individual in other_best_subnetworks.items():
         network_parts[identifier] = individual
 
@@ -150,6 +145,7 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
     # Co-evolution
     for generation in range(TOTAL_GENERATIONS):
         print('\nGENERATION ', generation)
+
         # Evolve each subpopulation
         for i in range(subpopulations_len):
             # Get the best individuals from the other subpopulations
