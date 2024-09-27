@@ -84,7 +84,7 @@ def create_logs_directory(experiment_name):
         os.makedirs('./' + experiment_name)
 
 
-def log_test_results(experiment_name, fitness, player_life, enemy_life, time):
+def log_test_results(apply_coevolution, enemy, player_life, enemy_life, time):
     print(f"\nPlayer Life: {player_life}")
     print(f"Enemy Life: {enemy_life}")
     print(f"Time: {time}")
@@ -95,10 +95,22 @@ def log_test_results(experiment_name, fitness, player_life, enemy_life, time):
     else:
         print("Result: It's a Draw!")
 
-    results_file = open(experiment_name + '/test_tesults.txt', 'a')
-    results_file.write('\n\nfitness, player_life, enemy_life, time')
-    results_file.write('\n' + str(round(fitness, 6))
-                       + ' ' + str(round(player_life, 6))
-                       + ' ' + str(round(enemy_life, 6))
-                       + ' ' + str(round(time, 6)))
-    results_file.close()
+    file_name = 'test_'
+    if apply_coevolution:
+        file_name += 'ea2_e'
+    else:
+        file_name += 'ea1_e'
+    file_name += str(enemy) + '.csv'
+
+    file_path = 'testing/' + file_name
+    file_exists = os.path.isfile(file_path)
+
+    with open(file_path, 'a', newline='') as results_file:
+        writer = csv.writer(results_file)
+
+        # Write header only if the file does not exist
+        if not file_exists:
+            writer.writerow(['player_life', 'enemy_life', 'gain'])
+
+        # Append data
+        writer.writerow([round(player_life, 6), round(enemy_life, 6), round(player_life - enemy_life, 6)])
