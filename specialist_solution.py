@@ -14,24 +14,26 @@ hidden_neurons = 10
 
 # Set experiment name
 experiment = 'experiments'
-is_test = False
+is_test = True
 apply_coevolution = True
+enemy_number = 1
 
 # Initialize simulation
 env = Environment(experiment_name=experiment,
-                  enemies=[7],
+                  enemies=[enemy_number],
                   playermode="ai",
                   player_controller=player_controller(hidden_neurons),
                   enemymode="static",
                   level=2,
                   speed="fastest",
+                  randomini="yes",
                   visuals=is_test)
 
 
 ini_time = start_experiment(experiment, is_test)
 
 if is_test:
-    test_experiment(experiment, env)
+    test_experiment(env, apply_coevolution, enemy_number)
 else:
     if apply_coevolution:
         cooperative_coevolution(experiment, env, hidden_neurons)
