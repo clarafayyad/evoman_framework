@@ -4,40 +4,42 @@ import matplotlib.pyplot as plt
 import os
 
 # Step 1: Define the directory where CSV files are located
-data_dir = ''
+data_dir = 'testing/'
 
-# Step 2: Define the list of CSV file names
-csv_files = ['test_ea1_e1.csv', 'test_ea1_e7.csv', 'test_ea1_e8.csv', 
-             'test_ea2_e1.csv', 'test_ea2_e7.csv', 'test_ea2_e8.csv']
+# Step 2: Define the list of CSV file names and their corresponding labels
+csv_files = ['test_ea1_e1.csv', 'test_ea2_e1.csv', 'test_ea1_e7.csv', 
+             'test_ea2_e7.csv', 'test_ea1_e8.csv'] # 'test_ea2_e8.csv']
+labels = ['EA1-E1', 'EA2-E1', 'EA1-E7', 'EA2-E7', 'EA1-E8']
 
-# Step 3: Create an empty list to store the average gains for each file
-gain_data = []
+# Step 3: Create an empty DataFrame to store the gains and their labels
+gain_data_combined = pd.DataFrame()
 
-# Step 4: Loop through the CSV files, read each one, and compute the average 'gain'
-for csv_file in csv_files:
+# Step 4: Loop through the CSV files, read each one, and add 'gain' and 'label' columns
+for csv_file, label in zip(csv_files, labels):
     file_path = os.path.join(data_dir, csv_file)
     
     # Load the CSV file into a DataFrame
     df = pd.read_csv(file_path)
     
-    # Append the 'gain' column to the gain_data list
-    gain_data.append(df['gain'])
+    # Add the 'gain' column and a 'label' column to indicate the source of the data
+    df['label'] = label
+    gain_data_combined = pd.concat([gain_data_combined, df[['gain', 'label']]])
 
-# Step 5: Prepare the plot with 6 boxplots side by side
+# Step 5: Prepare the plot
 plt.figure(figsize=(12, 6))
 
-# Create a list of labels for the boxplots
-labels = ['EA1-E1', 'EA1-E7', 'EA1-E8', 'EA2-E1', 'EA2-E7', 'EA2-E8']
+# Define a color palette: same color for EA1, another color for EA2
+palette = ['#1f77b4', '#ff7f0e']  # EA1: blue, EA2: orange
 
-# Plot the boxplots for the gain data from all CSVs
-sns.boxplot(data=gain_data)
+# Plot the boxplots for the gain data with hue based on the label (EA1 or EA2)
+sns.boxplot(x='label', y='gain', data=gain_data_combined, palette=palette[:2])
 
 # Step 6: Set the plot attributes
 plt.ylim(-100, 100)
-plt.title('Boxplots of Gain for Different CSV Files')
-plt.xlabel('Test Files')
-plt.ylabel('Gain')
-plt.xticks(ticks=range(len(labels)), labels=labels)
+plt.title('Boxplots of Gain for 2 EAs optimized against respective enemy', fontsize=20)
+plt.xlabel('EAs optimized to enemy', fontsize=16)
+plt.ylabel('Gain', fontsize=16)
+plt.xticks(fontsize=12)
 
 # Step 7: Create the directory to save the plot if it doesn't exist
 save_dir = 'graphs/box-plots/'
@@ -49,7 +51,6 @@ plot_path = os.path.join(save_dir, 'gain_boxplot_comparison.png')
 plt.savefig(plot_path)
 
 # Step 9: Show the plot
-plt.grid(True)
 plt.show()
 
 # Confirmation message
