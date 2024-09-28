@@ -5,7 +5,6 @@ import os
 
 # Function to read and aggregate multiple runs from CSV files
 def aggregate_runs(data_folder, algorithm_name, pattern="train_result*.csv"):
-    data_folder = '../' + data_folder
     files = glob.glob(os.path.join(data_folder, pattern))
     dfs = []
     
@@ -60,7 +59,7 @@ def plot_fitness_evolution(df, enemy_name, save_path):
 
     plt.xlabel('Generations', fontsize=16)
     plt.ylabel('Fitness', fontsize=16)
-    plt.title(f'Fitness Evolution across Generations (Enemy: {enemy_name})', fontsize=20)
+    plt.title(f'Fitness Evolution across Generations ({enemy_name})', fontsize=20)
     plt.legend(fontsize=6, loc='lower right')
     plt.grid(True)
     plt.savefig(save_path, dpi=300)
@@ -68,7 +67,7 @@ def plot_fitness_evolution(df, enemy_name, save_path):
 
 
 # Set the folders containing the data files for EA1 and EA2
-data_folder_ea1 = 'train_ea1_e8'  # Change e[number] to selected enemy
+data_folder_ea1 = 'train_ea1_e1'  # Change e[number] to selected enemy
 ea2_subfolders = [
     'input_to_hidden',
     'jump',
@@ -78,8 +77,8 @@ ea2_subfolders = [
     'walk_right'
 ]
 
-enemy_name = 'Enemy_8' # Change number to selected enemy
-save_path = f'../graphs/line-plots/aggregated_fitness_evolution_{enemy_name.lower()}.png'
+enemy_name = 'Enemy 1' # Change number to selected enemy
+save_path = f'graphs/line-plots/aggregated_fitness_evolution_{enemy_name.lower()}.png'
 
 # Call the function to aggregate data for EA1
 df_aggregated_ea1 = aggregate_runs(data_folder_ea1, 'EA1')
@@ -87,7 +86,7 @@ df_aggregated_ea1 = aggregate_runs(data_folder_ea1, 'EA1')
 # Aggregate data for each EA2 subsection
 df_aggregated_ea2_list = []
 for subfolder in ea2_subfolders:
-    data_folder_ea2 = f'train_ea2_e8/{subfolder}' # Change e[number] to selected enemy
+    data_folder_ea2 = f'train_ea2_e1/{subfolder}' # Change e[number] to selected enemy
     df_aggregated_ea2 = aggregate_runs(data_folder_ea2, f'EA2_{subfolder}')
     df_aggregated_ea2_list.append(df_aggregated_ea2)
 
