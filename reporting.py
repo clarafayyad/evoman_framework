@@ -84,7 +84,7 @@ def create_logs_directory(experiment_name):
         os.makedirs('./' + experiment_name)
 
 
-def log_test_results(apply_coevolution, enemy, player_life, enemy_life):
+def log_test_results(apply_coevolution, enemy, player_life, enemy_life, time):
     print(f"\nPlayer Life: {player_life}")
     print(f"Enemy Life: {enemy_life}")
     if enemy_life > player_life :
@@ -109,7 +109,7 @@ def log_test_results(apply_coevolution, enemy, player_life, enemy_life):
 
         # Write header only if the file does not exist
         if not file_exists:
-            writer.writerow(['player_life', 'enemy_life', 'gain'])
+            writer.writerow(['player_life', 'enemy_life', 'time', 'gain'])
 
         # Append data
-        writer.writerow([round(player_life, 6), round(enemy_life, 6), round(player_life - enemy_life, 6)])
+        writer.writerow([round(player_life, 6), round(enemy_life, 6), time, round(player_life - enemy_life, 6)])

@@ -14,7 +14,7 @@ def test_experiment(env, apply_coevolution, enemy_number):
     folder_name += str(enemy_number)
 
     if apply_coevolution:
-        file_list = glob.glob(folder_name + 'main_network_results/best_ind*.txt')
+        file_list = glob.glob(folder_name + '/main_network_results/best_ind*.txt')
     else:
         file_list = glob.glob(folder_name + '/best_ind*.txt')
 
@@ -27,20 +27,24 @@ def test_experiment(env, apply_coevolution, enemy_number):
 
         player_life_results = []
         enemy_life_results = []
+        time_results = []
 
         for i in range(tests_per_individual):
             print('\n RUN #' + str(i+1) + ' FOR SOLUTION ' + file_name + '\n')
             env.update_parameter('speed', 'normal')
-            fitness, player_life, enemy_life, time = env.play(pcont=best_solution)
+            _, player_life, enemy_life, time = env.play(pcont=best_solution)
 
             player_life_results.append(player_life)
             enemy_life_results.append(enemy_life)
+            time_results.append(time)
 
         avg_player_life = np.mean(player_life_results)
         avg_enemy_life = np.mean(enemy_life_results)
+        avg_time_result = np.mean(time_results)
 
-        log_test_results(apply_coevolution, enemy_number, avg_player_life, avg_enemy_life)
+        log_test_results(apply_coevolution, enemy_number, avg_player_life, avg_enemy_life, avg_time_result)
 
         player_life_results.clear()
         enemy_life_results.clear()
+        time_results.clear()
 
