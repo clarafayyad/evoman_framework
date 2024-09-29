@@ -84,10 +84,9 @@ def create_logs_directory(experiment_name):
         os.makedirs('./' + experiment_name)
 
 
-def log_test_results(apply_coevolution, enemy, player_life, enemy_life, time):
+def log_test_results(apply_coevolution, enemy, player_life, enemy_life):
     print(f"\nPlayer Life: {player_life}")
     print(f"Enemy Life: {enemy_life}")
-    print(f"Time: {time}")
     if enemy_life > player_life :
         print("Result: Player Lost!")
     elif player_life > enemy_life:

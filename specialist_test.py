@@ -1,20 +1,46 @@
 # imports
+import glob
 import numpy as np
 from reporting import log_test_results
 
 
 # loads file with the best solution for testing
 def test_experiment(env, apply_coevolution, enemy_number):
-    file_name = 'best_ind_'
+    folder_name = 'train_'
     if apply_coevolution:
-        file_name += 'ea2_e'
+        folder_name += 'ea2_e'
     else:
-        file_name += 'ea1_e'
-    file_name += str(enemy_number)
-    file_name += '.txt'
+        folder_name += 'ea1_e'
+    folder_name += str(enemy_number)
 
-    best_solution = np.loadtxt('best_inds_for_testing/' + file_name)
-    print('\n RUNNING SAVED BEST SOLUTION \n')
-    env.update_parameter('speed', 'normal')
-    fitness, player_life, enemy_life, time = env.play(pcont=best_solution)
-    log_test_results(apply_coevolution, enemy_number, player_life, enemy_life, time)
+    if apply_coevolution:
+        file_list = glob.glob(folder_name + 'main_network_results/best_ind*.txt')
+    else:
+        file_list = glob.glob(folder_name + '/best_ind*.txt')
+
+
+    tests_per_individual = 5
+
+    # Load each file and process it
+    for file_name in file_list:
+        best_solution = np.loadtxt(file_name)
+
+        player_life_results = []
+        enemy_life_results = []
+
+        for i in range(tests_per_individual):
+            print('\n RUN #' + str(i+1) + ' FOR SOLUTION ' + file_name + '\n')
+            env.update_parameter('speed', 'normal')
+            fitness, player_life, enemy_life, time = env.play(pcont=best_solution)
+
+            player_life_results.append(player_life)
+            enemy_life_results.append(enemy_life)
+
+        avg_player_life = np.mean(player_life_results)
+        avg_enemy_life = np.mean(enemy_life_results)
+
+        log_test_results(apply_coevolution, enemy_number, avg_player_life, avg_enemy_life)
+
+        player_life_results.clear()
+        enemy_life_results.clear()
+

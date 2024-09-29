@@ -15,7 +15,7 @@ hidden_neurons = 10
 # Set experiment name
 experiment = 'experiments'
 is_test = True
-apply_coevolution = True
+apply_coevolution = False
 enemy_number = 1
 
 # Initialize simulation
