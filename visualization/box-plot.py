@@ -7,7 +7,7 @@ import os
 data_dir = 'testing/'
 
 # Step 2: Define the list of CSV file names and their corresponding labels
-csv_files = ['test_ea1_e1.csv', 'test_ea2_e1.csv', 'test_ea1_e7.csv', 
+csv_files = ['test_ea1_e1.csv', 'test_ea2_e1.csv', 'test_ea1_e7.csv',
              'test_ea2_e7.csv', 'test_ea1_e8.csv'] # 'test_ea2_e8.csv']
 labels = ['EA1-E1', 'EA2-E1', 'EA1-E7', 'EA2-E7', 'EA1-E8']
 
