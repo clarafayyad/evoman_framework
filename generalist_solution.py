@@ -1,6 +1,7 @@
 # imports
 import global_env
-from coevolution import cooperative_coevolution
+from coevolution import CoevolutionaryAlgorithm
+from ea_config import EAConfigs
 
 from evoman.environment import Environment
 
@@ -18,4 +19,6 @@ env = Environment(experiment_name=global_env.experiment_name,
                   visuals=global_env.is_test)
 
 if __name__ == "__main__":
-    cooperative_coevolution(env)
+    configs = EAConfigs()
+    co_evolutionary_EA = CoevolutionaryAlgorithm(configs)
+    co_evolutionary_EA.cooperative_coevolution(env)
