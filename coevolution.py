@@ -35,19 +35,19 @@ class Subpopulation:
         # Select a random individual as the initial best individual
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
 
-    def evaluate(self, env, other_best_subnetworks):
+    def evaluate(self, env, best_subnetworks):
         for i, individual in enumerate(self.individuals):
             # Combine current individual with the best individuals from the other subnetworks
-            full_network = combine_subnetworks(self.identifier, individual, other_best_subnetworks)
+            full_network = combine_subnetworks(self.identifier, individual, best_subnetworks)
             # Evaluate full network
             self.fitness[i] = operators.evaluate_individual(env, full_network)
 
         # Find the best individual based on fitness
         self.best_individual = self.individuals[np.argmax(self.fitness)]
 
-    def evolve(self, env, experiment, generation_number, other_best_subnetworks):
+    def evolve(self, env, experiment, generation_number, best_subnetworks):
         # Evaluate current subnetwork/subpopulation
-        self.evaluate(env, other_best_subnetworks)
+        self.evaluate(env, best_subnetworks)
 
         # Create Offspring
         tournament_count = int(len(self.individuals) / 2)
@@ -69,7 +69,7 @@ class Subpopulation:
 
         # Evaluate offspring
         offspring_sub_pop = Subpopulation(self.identifier, offspring)
-        offspring_sub_pop.evaluate(env, other_best_subnetworks)
+        offspring_sub_pop.evaluate(env, best_subnetworks)
 
         # Apply fitness sharing
         # fitness, offspring_fitness = operators.fitness_sharing(
@@ -100,17 +100,14 @@ class Subpopulation:
         reporting.log_sub_pop_stats(experiment, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
 
 
-def combine_subnetworks(current_pop_id, current_individual, other_best_subnetworks):
+def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
     network_order = [FEATURES_POP, WALK_LEFT_POP, WALK_RIGHT_POP, JUMP_POP, SHOOT_POP, RELEASE_POP]
 
-    network_parts = {current_pop_id: current_individual}
-
-    for identifier, individual in other_best_subnetworks.items():
-        network_parts[identifier] = individual
+    best_subnetworks[current_pop_id] = current_individual
 
     combined_network = []
     for key in network_order:
-        combined_network.append(network_parts[key])
+        combined_network.append(best_subnetworks[key])
 
     return np.hstack(combined_network)
 
@@ -146,16 +143,14 @@ def cooperative_coevolution(experiment, env, hidden_neurons):
     for generation in range(TOTAL_GENERATIONS):
         print('\nGENERATION ', generation)
 
-        # Evolve each subpopulation
+        # Prepare a dictionary of the best individuals for each subpopulation
+        best_subnetworks = {}
         for i in range(subpopulations_len):
-            # Get the best individuals from the other subpopulations
-            other_best_subnetworks = {}
-            for j in range(subpopulations_len):
-                if j != i:
-                    other_best_subnetworks[subpopulations[j].identifier] = subpopulations[j].best_individual
+                best_subnetworks[subpopulations[i].identifier] = subpopulations[i].best_individual
 
-            # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
-            subpopulations[i].evolve(env, experiment, generation, other_best_subnetworks)
+        # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
+        for i in range(subpopulations_len):
+            subpopulations[i].evolve(env, experiment, generation, best_subnetworks)
 
         # Create best network out of subpopulations
         current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
