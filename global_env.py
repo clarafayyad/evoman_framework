@@ -3,6 +3,10 @@ from demo_controller import player_controller
 # NN configuration
 hidden_neurons = 10
 
+# Individual values bounds
+lower_bound = -1
+upper_bound = 1
+
 # Set global env specs
 is_test = False
 experiment_name = 'experiments'

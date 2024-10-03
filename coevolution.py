@@ -1,28 +1,10 @@
 import numpy as np
-
 import global_env
 import operators
 import reporting
 import stats
-
 from multiprocessing import Pool
-
 from evoman.environment import Environment
-
-# Define a set of constants
-POPULATION_SIZE = 100
-TOTAL_GENERATIONS = 50
-
-# Set EA Operators Parameters
-lower_bound = -1
-upper_bound = 1
-tournament_size = 3
-mutation_rate = 0.8
-mutation_sigma = 0.5
-selection_pressure = 1.1
-crossover_weight = 0.8
-crossover_rate = 0.8
-# sigma_share = 0.8  # niche radius
 
 # Define subnetworks identifiers
 FEATURES_POP = 'input_to_hidden'
@@ -32,14 +14,14 @@ JUMP_POP = 'jump'
 SHOOT_POP = 'shoot'
 RELEASE_POP = 'release'
 
-
 class Subpopulation:
-    def __init__(self, identifier, individuals):
+    def __init__(self, identifier, individuals, configs):
         self.identifier = identifier
         self.individuals = individuals
         self.fitness = np.zeros(len(individuals))
         # Select a random individual as the initial best individual
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
+        self.configs = configs
 
     def evaluate(self, env, best_subnetworks):
         for i, individual in enumerate(self.individuals):
@@ -61,20 +43,20 @@ class Subpopulation:
             self.individuals,
             self.fitness,
             tournament_count,
-            tournament_size,
-            crossover_weight,
-            crossover_rate,
+            self.configs.tournament_size,
+            self.configs.crossover_weight,
+            self.configs.crossover_rate,
         )
 
         # Mutate offspring
         for i in range(len(offspring)):
             # Apply gaussian mutation
-            offspring[i] = operators.gaussian_mutation(offspring[i], rate=mutation_rate, sigma=mutation_sigma)
+            offspring[i] = operators.gaussian_mutation(offspring[i], rate=self.configs.mutation_rate, sigma=self.configs.mutation_sigma)
             # Clamp the weights and biases within the initial range after applying variation operators
-            offspring[i] = operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
+            offspring[i] = operators.clamp_within_bounds(offspring[i], global_env.lower_bound, global_env.upper_bound)
 
         # Evaluate offspring
-        offspring_sub_pop = Subpopulation(self.identifier, offspring)
+        offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
         offspring_sub_pop.evaluate(env, best_subnetworks)
 
         # Apply fitness sharing
@@ -94,7 +76,7 @@ class Subpopulation:
             self.fitness,
             offspring_sub_pop.individuals,
             offspring_sub_pop.fitness,
-            s=selection_pressure
+            s=self.configs.selection_pressure
         )
 
         self.individuals = selected_individuals
@@ -118,13 +100,13 @@ def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
     return np.hstack(combined_network)
 
 
-def initialize_random_sub_population(identifier, individual_size):
+def initialize_random_sub_population(identifier, configs, individual_size):
     return Subpopulation(identifier, operators.initialize_population(
-        POPULATION_SIZE,
+        configs.population_size,
         individual_size,
-        lower_bound,
-        upper_bound
-    ))
+        global_env.lower_bound,
+        global_env.upper_bound
+    ), configs)
 
 
 def evolve_subpop(subpop, generation, best_subnetworks):
@@ -143,47 +125,51 @@ def evolve_subpop(subpop, generation, best_subnetworks):
     subpop.evolve(env, generation, best_subnetworks)
     return subpop
 
-def cooperative_coevolution(env):
-    input_to_hidden_size = (env.get_num_sensors() + 1) * global_env.hidden_neurons
-    hidden_to_output_size = global_env.hidden_neurons + 1
+class CoevolutionaryAlgorithm:
+    def __init__(self, configs):
+        self.configs = configs
+    def cooperative_coevolution(self, env):
+        input_to_hidden_size = (env.get_num_sensors() + 1) * global_env.hidden_neurons
+        hidden_to_output_size = global_env.hidden_neurons + 1
 
-    # Initialize subpopulations
-    features_pop = initialize_random_sub_population(FEATURES_POP, input_to_hidden_size)
-    walk_left_pop = initialize_random_sub_population(WALK_LEFT_POP, hidden_to_output_size)
-    walk_right_pop = initialize_random_sub_population(WALK_RIGHT_POP, hidden_to_output_size)
-    jump_pop = initialize_random_sub_population(JUMP_POP, hidden_to_output_size)
-    shoot_pop = initialize_random_sub_population(SHOOT_POP, hidden_to_output_size)
-    release_pop = initialize_random_sub_population(RELEASE_POP, hidden_to_output_size)
+        # Initialize subpopulations
+        features_pop = initialize_random_sub_population(FEATURES_POP, self.configs, input_to_hidden_size)
+        walk_left_pop = initialize_random_sub_population(WALK_LEFT_POP, self.configs, hidden_to_output_size)
+        walk_right_pop = initialize_random_sub_population(WALK_RIGHT_POP, self.configs, hidden_to_output_size)
+        jump_pop = initialize_random_sub_population(JUMP_POP, self.configs, hidden_to_output_size)
+        shoot_pop = initialize_random_sub_population(SHOOT_POP, self.configs, hidden_to_output_size)
+        release_pop = initialize_random_sub_population(RELEASE_POP, self.configs, hidden_to_output_size)
 
-    subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
 
-    best_individual_found = None
-    best_fitness_found = 0
+        subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
 
-    # Co-evolution
-    for generation in range(TOTAL_GENERATIONS):
-        print('\nGENERATION ', generation)
+        best_individual_found = None
+        best_fitness_found = 0
 
-        # Prepare a dictionary of the best individuals for each subpopulation
-        best_subnetworks = {subpop.identifier: subpop.best_individual for subpop in subpopulations}
+        # Co-evolution
+        for generation in range(self.configs.total_generations):
+            print('\nGENERATION ', generation)
 
-        # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
-        args_list = [(subpop, generation, best_subnetworks) for subpop in subpopulations]
-        with Pool(processes=len(subpopulations)) as pool:
-            subpopulations = pool.starmap(evolve_subpop, args_list)
-            pool.close()
-            pool.join()
+            # Prepare a dictionary of the best individuals for each subpopulation
+            best_subnetworks = {subpop.identifier: subpop.best_individual for subpop in subpopulations}
 
-        # Create best network out of subpopulations
-        current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
-        current_best_fitness = operators.evaluate_individual(env, current_best_network)
-        reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
+            # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
+            args_list = [(subpop, generation, best_subnetworks) for subpop in subpopulations]
+            with Pool(processes=len(subpopulations)) as pool:
+                subpopulations = pool.starmap(evolve_subpop, args_list)
+                pool.close()
+                pool.join()
 
-        if current_best_fitness > best_fitness_found:
-            best_individual_found = current_best_network
-            best_fitness_found = current_best_fitness
+            # Create best network out of subpopulations
+            current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
+            current_best_fitness = operators.evaluate_individual(env, current_best_network)
+            reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
 
-    reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_fitness_found)
+            if current_best_fitness > best_fitness_found:
+                best_individual_found = current_best_network
+                best_fitness_found = current_best_fitness
+
+        reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_fitness_found)
 
 
 
