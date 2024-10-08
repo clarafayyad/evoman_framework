@@ -1,7 +1,7 @@
 class EAConfigs:
-    def __init__(self, population_size=100, total_generations=50,
-                 tournament_size=3, mutation_rate=0.8, mutation_sigma=0.5,
-                 selection_pressure=1.1, crossover_weight=0.8, crossover_rate=0.8):
+    def __init__(self, population_size, total_generations,
+                 tournament_size, mutation_rate, mutation_sigma,
+                 selection_pressure, crossover_weight, crossover_rate):
         self.population_size = population_size
         self.total_generations = total_generations
         self.tournament_size = tournament_size
@@ -10,7 +10,6 @@ class EAConfigs:
         self.selection_pressure = selection_pressure
         self.crossover_weight = crossover_weight
         self.crossover_rate = crossover_rate
-        self.multi_obj_eval = False
 
     def display_config(self):
         print(f"Population Size: {self.population_size}")
