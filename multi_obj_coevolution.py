@@ -52,16 +52,16 @@ class Subpopulation:
         self.best_individual = select_best_pareto_individual(self.objectives)
 
         # Compute and log stats
-        self.evaluate(env, best_subnetworks)
-        best_individual_index, self.mean, self.std = stats.compute_stats(self.fitness)
-        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number,
-                                    self.fitness[best_individual_index], self.mean, self.std)
+        # self.evaluate(env, best_subnetworks)
+        # best_individual_index, self.mean, self.std = stats.compute_stats(self.fitness)
+        # reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number,
+        #                             self.fitness[best_individual_index], self.mean, self.std)
 
 
 class NSGA2Problem(Problem):
     def __init__(self, individuals, identifier, env, best_subnetworks):
         n_var = len(individuals[0])
-        super().__init__(n_var=n_var, n_obj=4, xl=global_env.lower_bound, xu=global_env.upper_bound)
+        super().__init__(n_var=n_var, n_obj=3, xl=global_env.lower_bound, xu=global_env.upper_bound)
 
         self.individuals = individuals
         self.identifier = identifier
