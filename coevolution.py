@@ -166,7 +166,7 @@ class CoevolutionaryAlgorithm:
 
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
-            current_best_fitness = operators.evaluate_individual(env, current_best_network)
+            current_best_fitness = evaluate_individual(env, current_best_network)
             reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
 
             if current_best_fitness > best_fitness_found:
