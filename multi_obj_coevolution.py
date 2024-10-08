@@ -1,12 +1,16 @@
 import numpy as np
+from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.optimize import minimize
+from pymoo.core.problem import Problem
+from multiprocessing import Pool
 
+from evoman.environment import Environment
+from evaluation import reward_objectives, evaluate_individual, select_best_pareto_individual
 import global_env
 import operators
 import reporting
 import stats
-from multiprocessing import Pool
-from evoman.environment import Environment
-from evaluation import evaluate_individual
+
 
 # Define subnetworks identifiers
 FEATURES_POP = 'input_to_hidden'
@@ -20,9 +24,11 @@ class Subpopulation:
     def __init__(self, identifier, individuals, configs):
         self.identifier = identifier
         self.individuals = individuals
-        self.fitness = np.zeros(len(individuals))
-        # Select a random individual as the initial best individual
+        self.fitness = np.zeros(len(individuals)) # This is only used for stats, not for evaluation or selection
+        self.objectives = np.array([])
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
+        self.mean = 0
+        self.std = 0
         self.configs = configs
 
     def evaluate(self, env, best_subnetworks):
@@ -36,59 +42,39 @@ class Subpopulation:
         self.best_individual = self.individuals[np.argmax(self.fitness)]
 
     def evolve(self, env, generation_number, best_subnetworks):
-        # Evaluate current subnetwork/subpopulation
-        self.evaluate(env, best_subnetworks)
+        problem = NSGA2Problem(self.individuals, self.configs, env, best_subnetworks)
+        algorithm = NSGA2(pop_size=len(self.individuals))
 
-        # Create Offspring
-        tournament_count = int(len(self.individuals) / 2)
-        offspring = operators.arithmetic_uniform_crossover(
-            self.individuals,
-            self.fitness,
-            tournament_count,
-            self.configs.tournament_size,
-            self.configs.crossover_weight,
-            self.configs.crossover_rate,
-        )
+        res = minimize(problem, algorithm, termination=('n_gen', self.configs.total_generations), seed=1)
 
-        # Mutate offspring
-        for i in range(len(offspring)):
-            # Apply gaussian mutation
-            offspring[i] = operators.gaussian_mutation(offspring[i], rate=self.configs.mutation_rate, sigma=self.configs.mutation_sigma)
-            # Clamp the weights and biases within the initial range after applying variation operators
-            offspring[i] = operators.clamp_within_bounds(offspring[i], global_env.lower_bound, global_env.upper_bound)
-
-        # Evaluate offspring
-        offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
-        offspring_sub_pop.evaluate(env, best_subnetworks)
-
-        # Apply fitness sharing
-        # fitness, offspring_fitness = operators.fitness_sharing(
-        #     self.individuals,
-        #     self.fitness,
-        #     offspring_sub_pop.individuals,
-        #     offspring_sub_pop.fitness,
-        #     parameters.sigma_share
-        # )
-        # self.fitness = fitness
-        # offspring_sub_pop.fitness = offspring_fitness
-
-        # Survivor selection
-        selected_individuals, selected_fitness_values = operators.linear_ranking_survivor_selection(
-            self.individuals,
-            self.fitness,
-            offspring_sub_pop.individuals,
-            offspring_sub_pop.fitness,
-            s=self.configs.selection_pressure
-        )
-
-        self.individuals = selected_individuals
-        self.fitness = selected_fitness_values
-        self.best_individual = self.individuals[np.argmax(self.fitness)]
+        self.individuals = res.X
+        self.objectives = res.F
+        self.best_individual = select_best_pareto_individual(self.objectives)
 
         # Compute and log stats
-        best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        self.evaluate(env, best_subnetworks)
+        best_individual_index, self.mean, self.std = stats.compute_stats(self.fitness)
+        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number,
+                                    self.fitness[best_individual_index], self.mean, self.std)
 
+
+class NSGA2Problem(Problem):
+    def __init__(self, individuals, identifier, env, best_subnetworks):
+        n_var = len(individuals[0])
+        super().__init__(n_var=n_var, n_obj=4, xl=global_env.lower_bound, xu=global_env.upper_bound)
+
+        self.individuals = individuals
+        self.identifier = identifier
+        self.env = env
+        self.best_subnetworks = best_subnetworks
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        fitness_objectives = []
+        for individual in x:
+            full_network = combine_subnetworks(self.identifier, individual, self.best_subnetworks)
+            objectives = reward_objectives(self.env, full_network)
+            fitness_objectives.append(objectives)
+        out["F"] = np.array(fitness_objectives)
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
     network_order = [FEATURES_POP, WALK_LEFT_POP, WALK_RIGHT_POP, JUMP_POP, SHOOT_POP, RELEASE_POP]
@@ -127,10 +113,9 @@ def evolve_subpop(subpop, generation, best_subnetworks):
     subpop.evolve(env, generation, best_subnetworks)
     return subpop
 
-class CoevolutionaryAlgorithm:
+class CoevolutionaryMultiObjAlgorithm:
     def __init__(self, configs):
         self.configs = configs
-        self.multi_obj_eval = False
 
     def cooperative_coevolution(self, env):
         input_to_hidden_size = (env.get_num_sensors() + 1) * global_env.hidden_neurons
@@ -164,10 +149,11 @@ class CoevolutionaryAlgorithm:
                 pool.close()
                 pool.join()
 
-            # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
-            current_best_fitness = operators.evaluate_individual(env, current_best_network)
-            reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
+            current_best_fitness = evaluate_individual(env, current_best_network)
+            current_avg_mean = np.mean([subpop.mean for subpop in subpopulations])
+            current_avg_std = np.mean([subpop.std for subpop in subpopulations])
+            reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, current_avg_mean, current_avg_std)
 
             if current_best_fitness > best_fitness_found:
                 best_individual_found = current_best_network

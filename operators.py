@@ -18,27 +18,6 @@ def initialize_population(population_size, individual_size, lower_bound=-1, uppe
     return np.random.uniform(lower_bound, upper_bound, (population_size, individual_size))
 
 
-def evaluate_individual(env, individual):
-    """
-     Evaluate an individual given an environment.
-    :param env: Simulation Environment.
-    :param individual: Numpy array of floats representing the individual.
-    :return: float: Fitness value of the individual.
-    """
-    fitness, _, _, _ = env.play(pcont=individual)
-    return fitness
-
-
-def evaluate_population(env, population):
-    """
-    Evaluate a population given an environment.
-    :param env: Simulation Environment
-    :param population: 2D numpy array representing individuals in a population.
-    :return: A numpy array representing the fitness values.
-    """
-    return np.array(list(map(lambda y: evaluate_individual(env, y), population)))
-
-
 def tournament(population, fitness_values, tournament_size):
     """
     Perform tournament selection to choose the best individual from a random subset of the population.
