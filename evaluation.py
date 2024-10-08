@@ -49,9 +49,3 @@ def reward_objectives(env, individual):
     time_reward = time_constraint_reward(enemy_life, time)
 
     return np.array([player_health, enemy_damage, time_reward])
-
-def select_best_pareto_individual(fitness):
-    ideal_point = np.max(fitness, axis=0)
-    distances = np.linalg.norm(fitness - ideal_point, axis=1)
-    best_index = np.argmin(distances)
-    return best_index

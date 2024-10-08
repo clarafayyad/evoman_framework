@@ -212,3 +212,44 @@ def sharing_function(distance, sigma_share):
         return 1 - (distance / sigma_share)
     else:
         return 0.0
+
+
+def pareto_based_survivor_selection(individuals, objectives, num_survivors):
+    pareto_front = pareto_sort(objectives)
+
+    # Randomly select n individuals from the first Pareto front
+    selected_indices = np.random.choice(pareto_front, size=min(num_survivors, len(pareto_front)), replace=False)
+
+    # Collect the selected individuals and their objectives
+    selected_individuals = np.array(individuals[selected_indices])
+    selected_objectives = np.array(objectives[selected_indices])
+
+    return selected_individuals, selected_objectives
+
+def pareto_sort(population_objectives):
+    num_individuals = len(population_objectives)
+    pareto_fronts = []
+    domination_count = np.zeros(num_individuals)
+    dominated_solutions = [[] for _ in range(num_individuals)]
+
+    for i in range(num_individuals):
+        for j in range(num_individuals):
+            if i != j:
+                if dominates(population_objectives[i], population_objectives[j]):
+                    dominated_solutions[i].append(j)
+                elif dominates(population_objectives[j], population_objectives[i]):
+                    domination_count[i] += 1
+
+        if domination_count[i] == 0:
+            pareto_fronts.append(i)
+
+    return pareto_fronts
+
+def dominates(obj1, obj2):
+    return all(o1 >= o2 for o1, o2 in zip(obj1, obj2)) and any(o1 > o2 for o1, o2 in zip(obj1, obj2))
+
+def select_best_pareto_individual(fitness):
+    ideal_point = np.max(fitness, axis=0)
+    distances = np.linalg.norm(fitness - ideal_point, axis=1)
+    best_index = np.argmin(distances)
+    return best_index
