@@ -10,6 +10,7 @@ class EAConfigs:
         self.selection_pressure = selection_pressure
         self.crossover_weight = crossover_weight
         self.crossover_rate = crossover_rate
+        self.multi_obj_eval = False
 
     def display_config(self):
         print(f"Population Size: {self.population_size}")
