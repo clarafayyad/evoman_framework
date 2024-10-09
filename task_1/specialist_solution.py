@@ -1,7 +1,7 @@
 # imports
 from specialist_test import test_experiment
-from specialist_coevolution import cooperative_coevolution
-from specialist_basic_evolution import basic_evolution
+from coevolution import cooperative_coevolution
+from basic_evolution import basic_evolution
 
 from demos.demo_controller import player_controller
 from evoman.environment import Environment

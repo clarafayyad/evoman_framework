@@ -25,7 +25,8 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
 
     # Log to file
     results_file_path = os.path.join(experiment_name, 'train_results.csv')
-    with open(results_file_path, mode='a', newline='') as results_file:
+    mode = 'w' if generation_number == 0 else 'a'
+    with open(results_file_path, mode=mode, newline='') as results_file:
         results_writer = csv.writer(results_file)
         if generation_number == 0:
             results_writer.writerow(['gen', 'best', 'mean', 'std'])
@@ -41,7 +42,8 @@ def log_sub_pop_stats(experiment_name, subpop_identifier, generation_number, max
     # Log to file
     file_name = subpop_identifier + '_train_results.csv'
     results_file_path = os.path.join(experiment_name, file_name)
-    with open(results_file_path, mode='a', newline='') as results_file:
+    mode = 'w' if generation_number == 0 else 'a'
+    with open(results_file_path, mode=mode, newline='') as results_file:
         results_writer = csv.writer(results_file)
         if generation_number == 0:
             results_writer.writerow(['gen', 'best', 'mean', 'std'])
