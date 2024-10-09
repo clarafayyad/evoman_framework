@@ -59,17 +59,6 @@ class Subpopulation:
         offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
         offspring_sub_pop.evaluate(env, best_subnetworks)
 
-        # Apply fitness sharing
-        # fitness, offspring_fitness = operators.fitness_sharing(
-        #     self.individuals,
-        #     self.fitness,
-        #     offspring_sub_pop.individuals,
-        #     offspring_sub_pop.fitness,
-        #     parameters.sigma_share
-        # )
-        # self.fitness = fitness
-        # offspring_sub_pop.fitness = offspring_fitness
-
         # Survivor selection
         selected_individuals, selected_fitness_values = operators.linear_ranking_survivor_selection(
             self.individuals,
@@ -144,6 +133,7 @@ class CoevolutionaryAlgorithm:
 
 
         subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
+        subpopulations_len = len(subpopulations)
 
         best_individual_found = None
         best_fitness_found = 0
@@ -152,15 +142,17 @@ class CoevolutionaryAlgorithm:
         for generation in range(self.configs.total_generations):
             print('\nGENERATION ', generation)
 
-            # Prepare a dictionary of the best individuals for each subpopulation
-            best_subnetworks = {subpop.identifier: subpop.best_individual for subpop in subpopulations}
+            # Evolve each subpopulation
+            for i in range(subpopulations_len):
+                # Get the best individuals from the other subpopulations
+                other_best_subnetworks = {}
+                for j in range(subpopulations_len):
+                    if j != i:
+                        other_best_subnetworks[subpopulations[j].identifier] = subpopulations[j].best_individual
 
-            # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
-            args_list = [(subpop, generation, best_subnetworks) for subpop in subpopulations]
-            with Pool(processes=len(subpopulations)) as pool:
-                subpopulations = pool.starmap(evolve_subpop, args_list)
-                pool.close()
-                pool.join()
+                # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
+                subpopulations[i].evolve(env, generation, other_best_subnetworks)
+
 
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
