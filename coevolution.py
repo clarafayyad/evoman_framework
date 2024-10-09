@@ -6,7 +6,7 @@ import reporting
 import stats
 from multiprocessing import Pool
 from evoman.environment import Environment
-from evaluation import evaluate_individual
+from evaluation import evaluate_individual, basic_evaluation
 
 # Define subnetworks identifiers
 FEATURES_POP = 'input_to_hidden'
@@ -15,6 +15,7 @@ WALK_RIGHT_POP = 'walk_right'
 JUMP_POP = 'jump'
 SHOOT_POP = 'shoot'
 RELEASE_POP = 'release'
+
 
 class Subpopulation:
     def __init__(self, identifier, individuals, configs):
@@ -25,19 +26,19 @@ class Subpopulation:
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
         self.configs = configs
 
-    def evaluate(self, env, best_subnetworks):
+    def evaluate(self, env, generation, best_subnetworks):
         for i, individual in enumerate(self.individuals):
             # Combine current individual with the best individuals from the other subnetworks
             full_network = combine_subnetworks(self.identifier, individual, best_subnetworks)
             # Evaluate full network
-            self.fitness[i] = evaluate_individual(env, full_network)
+            self.fitness[i] = evaluate_individual(env, generation, self.configs.total_generations, full_network)
 
         # Find the best individual based on fitness
         self.best_individual = self.individuals[np.argmax(self.fitness)]
 
     def evolve(self, env, generation_number, best_subnetworks):
         # Evaluate current subnetwork/subpopulation
-        self.evaluate(env, best_subnetworks)
+        self.evaluate(env, generation_number, best_subnetworks)
 
         # Create Offspring
         tournament_count = int(len(self.individuals) / 2)
@@ -53,13 +54,14 @@ class Subpopulation:
         # Mutate offspring
         for i in range(len(offspring)):
             # Apply gaussian mutation
-            offspring[i] = operators.gaussian_mutation(offspring[i], rate=self.configs.mutation_rate, sigma=self.configs.mutation_sigma)
+            offspring[i] = operators.gaussian_mutation(offspring[i], rate=self.configs.mutation_rate,
+                                                       sigma=self.configs.mutation_sigma)
             # Clamp the weights and biases within the initial range after applying variation operators
             offspring[i] = operators.clamp_within_bounds(offspring[i], global_env.lower_bound, global_env.upper_bound)
 
         # Evaluate offspring
         offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
-        offspring_sub_pop.evaluate(env, best_subnetworks)
+        offspring_sub_pop.evaluate(env, generation_number, best_subnetworks)
 
         # Survivor selection
         selected_individuals, selected_fitness_values = operators.linear_ranking_survivor_selection(
@@ -76,7 +78,8 @@ class Subpopulation:
 
         # Compute and log stats
         best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number,
+                                    self.fitness[best_individual_index], mean, std)
 
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
@@ -116,6 +119,7 @@ def evolve_subpop(subpop, generation, best_subnetworks):
     subpop.evolve(env, generation, best_subnetworks)
     return subpop
 
+
 class CoevolutionaryAlgorithm:
     def __init__(self, configs):
         self.configs = configs
@@ -132,7 +136,6 @@ class CoevolutionaryAlgorithm:
         shoot_pop = initialize_random_sub_population(SHOOT_POP, self.configs, hidden_to_output_size)
         release_pop = initialize_random_sub_population(RELEASE_POP, self.configs, hidden_to_output_size)
 
-
         subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
         subpopulations_len = len(subpopulations)
 
@@ -140,7 +143,7 @@ class CoevolutionaryAlgorithm:
         best_fitness_found = 0
 
         # Co-evolution
-        for generation in range(self.configs.total_generations):
+        for generation in range(self.configs.total_generations + 1):
             print('\nGENERATION ', generation)
 
             # Evolve each subpopulation
@@ -154,10 +157,13 @@ class CoevolutionaryAlgorithm:
                 # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
                 subpopulations[i].evolve(env, generation, other_best_subnetworks)
 
-
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
-            current_best_fitness = evaluate_individual(env, current_best_network)
+            current_best_fitness = evaluate_individual(env, generation, self.configs.total_generations, current_best_network)
+            basic_fitness_value = basic_evaluation(env, current_best_network)
+            print('current basic fitness: ', basic_fitness_value)
+            if global_env.apply_dynamic_rewards:
+                print('current dynamic fitness: ', current_best_fitness)
             reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
 
             if current_best_fitness > best_fitness_found:
@@ -165,8 +171,3 @@ class CoevolutionaryAlgorithm:
                 best_fitness_found = current_best_fitness
 
         reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_fitness_found)
-
-
-
-
-

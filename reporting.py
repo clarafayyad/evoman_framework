@@ -18,10 +18,10 @@ def retrieve_last_generation(experiment_name):
 
 def log_stats(experiment_name, generation_number, max_fitness, mean, std):
     # Display relevant message
-    print('\n GENERATION ' + str(generation_number)
-          + ' ' + str(round(max_fitness, 6))
-          + ' ' + str(round(mean, 6))
-          + ' ' + str(round(std, 6)))
+    # print('\n GENERATION ' + str(generation_number)
+    #       + ' ' + str(round(max_fitness, 6))
+    #       + ' ' + str(round(mean, 6))
+    #       + ' ' + str(round(std, 6)))
 
     # Log to file
     results_file_path = os.path.join(experiment_name, 'train_results.csv')
