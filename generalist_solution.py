@@ -11,9 +11,6 @@ from generalist_test import test_experiment
 from evoman.environment import Environment
 from reporting import start_experiment, end_experiment
 
-from pymoo.config import Config
-Config.warnings['not_compiled'] = False
-
 
 # Initialize simulation
 env = Environment(experiment_name=global_env.experiment_name,
