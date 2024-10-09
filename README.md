@@ -13,6 +13,9 @@ To train the agent, follow these steps:
 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `is_test`: `False`
+   - `apply_dynamic_rewards`: 
+     - Set to `True` if you want to apply the dynamic rewards' evaluation.
+     - Set to `False` if you prefer the regular evaluation.
    - `apply_multi_objective`: 
      - Set to `True` if you want to apply the multi objective evaluation algorithm.
      - Set to `False` if you prefer the regular co-evolutionary algorithm.
@@ -29,6 +32,9 @@ To test the agent, follow these steps:
 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `is_test`: `True`
+   - `apply_dynamic_rewards`: 
+     - Set to `True` if you want to apply the dynamic rewards' evaluation.
+     - Set to `False` if you prefer the regular evaluation.
    - `apply_multi_objective`: 
      - Set to `True` if you want to apply the multi objective evaluation algorithm.
      - Set to `False` if you prefer the regular co-evolutionary algorithm.
@@ -48,6 +54,9 @@ To test the agent, follow these steps:
 To tune the algorithm using optuna, follow these steps: 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `tuner_trials`: This is the number of trials the tuner will run to find the best parameters. 
+   - `apply_dynamic_rewards`: 
+     - Set to `True` if you want to apply the dynamic rewards' evaluation.
+     - Set to `False` if you prefer the regular evaluation.
    - `apply_multi_objective`: 
      - Set to `True` if you want to apply the multi objective evaluation algorithm.
      - Set to `False` if you prefer the regular co-evolutionary algorithm.
