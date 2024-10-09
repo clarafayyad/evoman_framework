@@ -213,12 +213,6 @@ def sharing_function(distance, sigma_share):
     else:
         return 0.0
 
-
-def pareto_based_survivor_selection(objectives, num_survivors):
-    pareto_front = pareto_sort(objectives)
-    # Randomly select n individuals from the first Pareto front
-    return np.random.choice(pareto_front, size=min(num_survivors, len(pareto_front)), replace=False)
-
 def pareto_sort(population_objectives):
     num_individuals = len(population_objectives)
     pareto_fronts = []
@@ -246,3 +240,53 @@ def select_best_pareto_individual(fitness):
     distances = np.linalg.norm(fitness - ideal_point, axis=1)
     best_index = np.argmin(distances)
     return best_index
+
+
+def compute_crowding_distance(objectives):
+    num_individuals = len(objectives)
+    num_objectives = len(objectives[0])
+
+    # Initialize crowding distances to 0 for all individuals
+    crowding_distances = np.zeros(num_individuals)
+
+    # For each objective, calculate the crowding distance
+    for i in range(num_objectives):
+        # Sort individuals based on the i-th objective
+        sorted_indices = np.argsort([obj[i] for obj in objectives])
+        sorted_objectives = [objectives[idx][i] for idx in sorted_indices]
+
+        # Assign infinite distance to boundary points (extremes)
+        crowding_distances[sorted_indices[0]] = np.inf
+        crowding_distances[sorted_indices[-1]] = np.inf
+
+        # Calculate distances for the rest
+        for j in range(1, num_individuals - 1):
+            crowding_distances[sorted_indices[j]] += (
+                    (sorted_objectives[j + 1] - sorted_objectives[j - 1]) /
+                    (sorted_objectives[-1] - sorted_objectives[0] + 1e-9)
+            )
+
+    return crowding_distances
+
+
+def pareto_based_survivor_selection(objectives, num_survivors):
+    pareto_front = pareto_sort(objectives)
+
+    crowding_distances = compute_crowding_distance([objectives[i] for i in pareto_front])
+
+    sorted_indices = np.argsort(-crowding_distances)
+    sorted_pareto_front = [pareto_front[i] for i in sorted_indices]
+
+    if len(pareto_front) >= num_survivors:
+        return np.array(sorted_pareto_front[:num_survivors])
+
+    survivors = sorted_pareto_front
+    remaining_slots = num_survivors - len(pareto_front)
+
+    non_pareto_indices = [i for i in range(len(objectives)) if i not in pareto_front]
+
+    # Randomly select remaining individuals from the non-Pareto population
+    remaining_individuals = np.random.choice(non_pareto_indices, size=remaining_slots, replace=False)
+    survivors.extend(remaining_individuals)
+
+    return np.array(survivors)

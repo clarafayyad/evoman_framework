@@ -23,7 +23,7 @@ class Subpopulation:
         self.fitness = np.zeros(len(individuals))
         # Select a random individual as the initial best individual
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
-        self.objectives = np.array([])
+        self.objectives = np.array([np.array([0, 0, 0]) for _ in range(len(individuals))])
         self.configs = configs
 
     def evaluate(self, env, best_subnetworks):
@@ -33,7 +33,7 @@ class Subpopulation:
             # Evaluate full network
             self.objectives[i], self.fitness[i] = evaluate_objectives_and_fitness(env, full_network)
 
-        # Find the best individual based on fitness
+        # Find the best individual based on pareto front
         self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
     def evolve(self, env, generation_number, best_subnetworks):
@@ -62,9 +62,9 @@ class Subpopulation:
         offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
         offspring_sub_pop.evaluate(env, best_subnetworks)
 
-        combined_individuals = self.individuals + offspring_sub_pop.individuals
-        combined_objectives = np.vstack([self.objectives, offspring_sub_pop.objectives])
-        combined_fitness = self.fitness + offspring_sub_pop.objectives
+        combined_individuals = np.concatenate((self.individuals, offspring_sub_pop.individuals), axis=0)
+        combined_fitness = np.concatenate((self.fitness, offspring_sub_pop.fitness), axis=0)
+        combined_objectives = np.concatenate((self.objectives, offspring_sub_pop.objectives), axis=0)
 
         # Pareto-based Survivor selection
         selected_indices = operators.pareto_based_survivor_selection(combined_objectives, self.configs.population_size)
@@ -74,8 +74,8 @@ class Subpopulation:
         self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
         # Compute and log stats
-        best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        # best_individual_index, mean, std = stats.compute_stats(self.fitness)
+        # reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
 
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
@@ -130,7 +130,6 @@ class CoevolutionaryMultiObjAlgorithm:
         jump_pop = initialize_random_sub_population(JUMP_POP, self.configs, hidden_to_output_size)
         shoot_pop = initialize_random_sub_population(SHOOT_POP, self.configs, hidden_to_output_size)
         release_pop = initialize_random_sub_population(RELEASE_POP, self.configs, hidden_to_output_size)
-
 
         subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
         subpopulations_len = len(subpopulations)

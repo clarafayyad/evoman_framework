@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def evaluate_individual(env, individual):
     """
      Evaluate an individual given an environment.
@@ -20,8 +21,10 @@ def evaluate_population(env, population):
     """
     return np.array(list(map(lambda y: evaluate_individual(env, y), population)))
 
+
 def player_health_reward(player_life):
     return player_life
+
 
 def enemy_damage_reward(enemy_life):
     enemy_defeat_reward = 50
@@ -30,16 +33,18 @@ def enemy_damage_reward(enemy_life):
         return base_reward + enemy_defeat_reward
     return base_reward
 
+
 def time_constraint_reward(enemy_health, time):
     max_time = 500
     time_normalized = time / max_time
 
     if enemy_health == 0:
-        reward = 1 - time_normalized # reward faster enemy defeat
+        reward = 1 - time_normalized  # reward faster enemy defeat
     else:
         reward = 0
 
-    return max(0, min(reward, 1)) # between 0 and 1
+    return max(0, min(reward, 1))  # between 0 and 1
+
 
 def evaluate_objectives_and_fitness(env, individual):
     fitness, player_life, enemy_life, time = env.play(pcont=individual)
