@@ -7,7 +7,7 @@ enemies = [1]
 multiple_mode = 'no'
 experiment_name = 'experiments'
 
-#  Tuner
+# Tuner
 tuner_trials = 100
 
 # NN configuration
