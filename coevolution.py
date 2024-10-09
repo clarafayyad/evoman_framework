@@ -130,7 +130,6 @@ def evolve_subpop(subpop, generation, best_subnetworks):
 class CoevolutionaryAlgorithm:
     def __init__(self, configs):
         self.configs = configs
-        self.multi_obj_eval = False
 
     def cooperative_coevolution(self, env):
         input_to_hidden_size = (env.get_num_sensors() + 1) * global_env.hidden_neurons

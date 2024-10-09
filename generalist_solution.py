@@ -55,7 +55,6 @@ if __name__ == "__main__":
                 crossover_rate=hyperparams.crossover_rate,
             )
             ea = CoevolutionaryAlgorithm(configs)
-            ea.multi_obj_eval = global_env.apply_multi_objective
             ea.cooperative_coevolution(env)
 
     end_experiment(time.time() - ini_time)
