@@ -34,10 +34,10 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
 
 def log_sub_pop_stats(experiment_name, subpop_identifier, generation_number, max_fitness, mean, std):
     # Display relevant message
-    print('\n SUBPOP ' + subpop_identifier
-          + '\n ' + str(round(max_fitness, 6))
-          + ' ' + str(round(mean, 6))
-          + ' ' + str(round(std, 6)))
+    # print('\n SUBPOP ' + subpop_identifier
+    #       + '\n ' + str(round(max_fitness, 6))
+    #       + ' ' + str(round(mean, 6))
+    #       + ' ' + str(round(std, 6)))
 
     # Log to file
     file_name = subpop_identifier + '_train_results.csv'

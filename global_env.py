@@ -2,12 +2,12 @@ from demo_controller import player_controller
 
 # Experimental Setup
 is_test = False
-apply_multi_objective = False
+apply_multi_objective = True
 enemies = [1]
-multiple_mode = 'yes'
+multiple_mode = 'no'
 experiment_name = 'experiments'
 
-#  Tuner
+# Tuner
 tuner_trials = 100
 
 # NN configuration

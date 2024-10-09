@@ -2,6 +2,7 @@
 import reporting
 import stats
 import operators
+from evaluation import evaluate_population
 
 # Define a set of constants
 POPULATION_SIZE = 200
@@ -28,7 +29,7 @@ def basic_evolution(experiment, env, hidden_neurons):
 
     # Initialize population
     population = operators.initialize_population(POPULATION_SIZE, individual_size, lower_bound, upper_bound)
-    fitness_values = operators.evaluate_population(env, population)
+    fitness_values = evaluate_population(env, population)
 
     # Save current population and fitness values
     env.update_solutions([population, fitness_values])
@@ -61,7 +62,7 @@ def basic_evolution(experiment, env, hidden_neurons):
             offspring[i] = operators.clamp_within_bounds(offspring[i], lower_bound, upper_bound)
 
         # Evaluate offspring
-        offspring_fitness = operators.evaluate_population(env, offspring)
+        offspring_fitness = evaluate_population(env, offspring)
 
         # Apply fitness sharing
         # fitness_values, offspring_fitness = operators.fitness_sharing(

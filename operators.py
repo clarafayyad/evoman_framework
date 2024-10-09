@@ -18,27 +18,6 @@ def initialize_population(population_size, individual_size, lower_bound=-1, uppe
     return np.random.uniform(lower_bound, upper_bound, (population_size, individual_size))
 
 
-def evaluate_individual(env, individual):
-    """
-     Evaluate an individual given an environment.
-    :param env: Simulation Environment.
-    :param individual: Numpy array of floats representing the individual.
-    :return: float: Fitness value of the individual.
-    """
-    fitness, _, _, _ = env.play(pcont=individual)
-    return fitness
-
-
-def evaluate_population(env, population):
-    """
-    Evaluate a population given an environment.
-    :param env: Simulation Environment
-    :param population: 2D numpy array representing individuals in a population.
-    :return: A numpy array representing the fitness values.
-    """
-    return np.array(list(map(lambda y: evaluate_individual(env, y), population)))
-
-
 def tournament(population, fitness_values, tournament_size):
     """
     Perform tournament selection to choose the best individual from a random subset of the population.
@@ -233,3 +212,81 @@ def sharing_function(distance, sigma_share):
         return 1 - (distance / sigma_share)
     else:
         return 0.0
+
+def pareto_sort(population_objectives):
+    num_individuals = len(population_objectives)
+    pareto_fronts = []
+    domination_count = np.zeros(num_individuals)
+    dominated_solutions = [[] for _ in range(num_individuals)]
+
+    for i in range(num_individuals):
+        for j in range(num_individuals):
+            if i != j:
+                if dominates(population_objectives[i], population_objectives[j]):
+                    dominated_solutions[i].append(j)
+                elif dominates(population_objectives[j], population_objectives[i]):
+                    domination_count[i] += 1
+
+        if domination_count[i] == 0:
+            pareto_fronts.append(i)
+
+    return pareto_fronts
+
+def dominates(obj1, obj2):
+    return all(o1 >= o2 for o1, o2 in zip(obj1, obj2)) and any(o1 > o2 for o1, o2 in zip(obj1, obj2))
+
+def select_best_pareto_individual(fitness):
+    ideal_point = np.max(fitness, axis=0)
+    distances = np.linalg.norm(fitness - ideal_point, axis=1)
+    best_index = np.argmin(distances)
+    return best_index
+
+
+def compute_crowding_distance(objectives):
+    num_individuals = len(objectives)
+    num_objectives = len(objectives[0])
+
+    # Initialize crowding distances to 0 for all individuals
+    crowding_distances = np.zeros(num_individuals)
+
+    # For each objective, calculate the crowding distance
+    for i in range(num_objectives):
+        # Sort individuals based on the i-th objective
+        sorted_indices = np.argsort([obj[i] for obj in objectives])
+        sorted_objectives = [objectives[idx][i] for idx in sorted_indices]
+
+        # Assign infinite distance to boundary points (extremes)
+        crowding_distances[sorted_indices[0]] = np.inf
+        crowding_distances[sorted_indices[-1]] = np.inf
+
+        # Calculate distances for the rest
+        for j in range(1, num_individuals - 1):
+            crowding_distances[sorted_indices[j]] += (
+                    (sorted_objectives[j + 1] - sorted_objectives[j - 1]) /
+                    (sorted_objectives[-1] - sorted_objectives[0] + 1e-9)
+            )
+
+    return crowding_distances
+
+
+def pareto_based_survivor_selection(objectives, num_survivors):
+    pareto_front = pareto_sort(objectives)
+
+    crowding_distances = compute_crowding_distance([objectives[i] for i in pareto_front])
+
+    sorted_indices = np.argsort(-crowding_distances)
+    sorted_pareto_front = [pareto_front[i] for i in sorted_indices]
+
+    if len(pareto_front) >= num_survivors:
+        return np.array(sorted_pareto_front[:num_survivors])
+
+    survivors = sorted_pareto_front
+    remaining_slots = num_survivors - len(pareto_front)
+
+    non_pareto_indices = [i for i in range(len(objectives)) if i not in pareto_front]
+
+    # Randomly select remaining individuals from the non-Pareto population
+    remaining_individuals = np.random.choice(non_pareto_indices, size=remaining_slots, replace=False)
+    survivors.extend(remaining_individuals)
+
+    return np.array(survivors)

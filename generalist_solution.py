@@ -1,12 +1,15 @@
 # imports
+import time
+
 import global_env
 import hyperparams
 import multi_obj_hyperparams
 from coevolution import CoevolutionaryAlgorithm
+from multi_obj_coevolution import CoevolutionaryMultiObjAlgorithm
 from ea_config import EAConfigs
 from generalist_test import test_experiment
-
 from evoman.environment import Environment
+from reporting import start_experiment, end_experiment
 
 
 # Initialize simulation
@@ -22,19 +25,11 @@ env = Environment(experiment_name=global_env.experiment_name,
                   visuals=global_env.is_test)
 
 if __name__ == "__main__":
+    ini_time = start_experiment(global_env.experiment_name, global_env.is_test)
+
     if global_env.is_test:
         test_experiment(env)
     else:
-        configs = EAConfigs(
-            population_size=hyperparams.population_size,
-            total_generations=hyperparams.total_generations,
-            tournament_size=hyperparams.tournament_size,
-            mutation_rate=hyperparams.mutation_rate,
-            mutation_sigma=hyperparams.mutation_sigma,
-            selection_pressure=hyperparams.selection_pressure,
-            crossover_weight=hyperparams.crossover_weight,
-            crossover_rate=hyperparams.crossover_rate,
-        )
         if global_env.apply_multi_objective:
             configs = EAConfigs(
                 population_size=multi_obj_hyperparams.population_size,
@@ -42,10 +37,25 @@ if __name__ == "__main__":
                 tournament_size=multi_obj_hyperparams.tournament_size,
                 mutation_rate=multi_obj_hyperparams.mutation_rate,
                 mutation_sigma=multi_obj_hyperparams.mutation_sigma,
-                selection_pressure=multi_obj_hyperparams.selection_pressure,
+                selection_pressure=0, # unused here
                 crossover_weight=multi_obj_hyperparams.crossover_weight,
                 crossover_rate=multi_obj_hyperparams.crossover_rate,
             )
-        co_evolutionary_EA = CoevolutionaryAlgorithm(configs)
-        co_evolutionary_EA.multi_obj_eval = global_env.apply_multi_objective
-        co_evolutionary_EA.cooperative_coevolution(env)
+            ea = CoevolutionaryMultiObjAlgorithm(configs)
+            ea.cooperative_coevolution(env)
+        else:
+            configs = EAConfigs(
+                population_size=hyperparams.population_size,
+                total_generations=hyperparams.total_generations,
+                tournament_size=hyperparams.tournament_size,
+                mutation_rate=hyperparams.mutation_rate,
+                mutation_sigma=hyperparams.mutation_sigma,
+                selection_pressure=hyperparams.selection_pressure,
+                crossover_weight=hyperparams.crossover_weight,
+                crossover_rate=hyperparams.crossover_rate,
+            )
+            ea = CoevolutionaryAlgorithm(configs)
+            ea.cooperative_coevolution(env)
+
+    end_experiment(time.time() - ini_time)
+

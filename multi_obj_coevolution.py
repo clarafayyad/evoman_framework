@@ -6,7 +6,7 @@ import reporting
 import stats
 from multiprocessing import Pool
 from evoman.environment import Environment
-from evaluation import evaluate_individual
+from evaluation import evaluate_individual, evaluate_objectives_and_fitness
 
 # Define subnetworks identifiers
 FEATURES_POP = 'input_to_hidden'
@@ -23,6 +23,7 @@ class Subpopulation:
         self.fitness = np.zeros(len(individuals))
         # Select a random individual as the initial best individual
         self.best_individual = self.individuals[np.random.randint(len(individuals))]
+        self.objectives = np.array([np.array([0, 0, 0]) for _ in range(len(individuals))])
         self.configs = configs
 
     def evaluate(self, env, best_subnetworks):
@@ -30,10 +31,10 @@ class Subpopulation:
             # Combine current individual with the best individuals from the other subnetworks
             full_network = combine_subnetworks(self.identifier, individual, best_subnetworks)
             # Evaluate full network
-            self.fitness[i] = evaluate_individual(env, full_network)
+            self.objectives[i], self.fitness[i] = evaluate_objectives_and_fitness(env, full_network)
 
-        # Find the best individual based on fitness
-        self.best_individual = self.individuals[np.argmax(self.fitness)]
+        # Find the best individual based on pareto front
+        self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
     def evolve(self, env, generation_number, best_subnetworks):
         # Evaluate current subnetwork/subpopulation
@@ -61,18 +62,16 @@ class Subpopulation:
         offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
         offspring_sub_pop.evaluate(env, best_subnetworks)
 
-        # Survivor selection
-        selected_individuals, selected_fitness_values = operators.linear_ranking_survivor_selection(
-            self.individuals,
-            self.fitness,
-            offspring_sub_pop.individuals,
-            offspring_sub_pop.fitness,
-            s=self.configs.selection_pressure
-        )
+        combined_individuals = np.concatenate((self.individuals, offspring_sub_pop.individuals), axis=0)
+        combined_fitness = np.concatenate((self.fitness, offspring_sub_pop.fitness), axis=0)
+        combined_objectives = np.concatenate((self.objectives, offspring_sub_pop.objectives), axis=0)
 
-        self.individuals = selected_individuals
-        self.fitness = selected_fitness_values
-        self.best_individual = self.individuals[np.argmax(self.fitness)]
+        # Pareto-based Survivor selection
+        selected_indices = operators.pareto_based_survivor_selection(combined_objectives, self.configs.population_size)
+        self.individuals = combined_individuals[selected_indices]
+        self.objectives = combined_objectives[selected_indices]
+        self.fitness = combined_fitness[selected_indices]
+        self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
         # Compute and log stats
         best_individual_index, mean, std = stats.compute_stats(self.fitness)
@@ -116,7 +115,7 @@ def evolve_subpop(subpop, generation, best_subnetworks):
     subpop.evolve(env, generation, best_subnetworks)
     return subpop
 
-class CoevolutionaryAlgorithm:
+class CoevolutionaryMultiObjAlgorithm:
     def __init__(self, configs):
         self.configs = configs
 
@@ -131,7 +130,6 @@ class CoevolutionaryAlgorithm:
         jump_pop = initialize_random_sub_population(JUMP_POP, self.configs, hidden_to_output_size)
         shoot_pop = initialize_random_sub_population(SHOOT_POP, self.configs, hidden_to_output_size)
         release_pop = initialize_random_sub_population(RELEASE_POP, self.configs, hidden_to_output_size)
-
 
         subpopulations = [features_pop, walk_left_pop, walk_right_pop, jump_pop, shoot_pop, release_pop]
         subpopulations_len = len(subpopulations)
@@ -153,7 +151,6 @@ class CoevolutionaryAlgorithm:
 
                 # Evolve current subpopulation by evaluating it with the best individuals from the other subpopulations
                 subpopulations[i].evolve(env, generation, other_best_subnetworks)
-
 
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
