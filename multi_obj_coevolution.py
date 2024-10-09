@@ -6,7 +6,7 @@ import reporting
 import stats
 from multiprocessing import Pool
 from evoman.environment import Environment
-from evaluation import evaluate_individual, reward_objectives
+from evaluation import evaluate_individual, evaluate_objectives_and_fitness
 
 # Define subnetworks identifiers
 FEATURES_POP = 'input_to_hidden'
@@ -31,11 +31,10 @@ class Subpopulation:
             # Combine current individual with the best individuals from the other subnetworks
             full_network = combine_subnetworks(self.identifier, individual, best_subnetworks)
             # Evaluate full network
-            self.fitness[i] = evaluate_individual(env, full_network)
-            self.objectives[i] = reward_objectives(env, full_network)
+            self.objectives[i], self.fitness[i] = evaluate_objectives_and_fitness(env, full_network)
 
         # Find the best individual based on fitness
-        self.best_individual = self.individuals[np.argmax(self.fitness)]
+        self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
     def evolve(self, env, generation_number, best_subnetworks):
         # Evaluate current subnetwork/subpopulation
@@ -63,20 +62,20 @@ class Subpopulation:
         offspring_sub_pop = Subpopulation(self.identifier, offspring, self.configs)
         offspring_sub_pop.evaluate(env, best_subnetworks)
 
-        # Pareto-based Survivor selection
-        selected_individuals, selected_objectives = operators.pareto_based_survivor_selection(
-            self.individuals + offspring_sub_pop.individuals,
-            np.vstack([self.objectives, offspring_sub_pop.objectives]),
-            self.configs.population_size
-        )
+        combined_individuals = self.individuals + offspring_sub_pop.individuals
+        combined_objectives = np.vstack([self.objectives, offspring_sub_pop.objectives])
+        combined_fitness = self.fitness + offspring_sub_pop.objectives
 
-        self.individuals = selected_individuals
-        self.objectives = selected_objectives
+        # Pareto-based Survivor selection
+        selected_indices = operators.pareto_based_survivor_selection(combined_objectives, self.configs.population_size)
+        self.individuals = combined_individuals[selected_indices]
+        self.objectives = combined_objectives[selected_indices]
+        self.fitness = combined_fitness[selected_indices]
         self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
         # Compute and log stats
-        # best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        # reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        best_individual_index, mean, std = stats.compute_stats(self.fitness)
+        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
 
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
@@ -119,7 +118,6 @@ def evolve_subpop(subpop, generation, best_subnetworks):
 class CoevolutionaryMultiObjAlgorithm:
     def __init__(self, configs):
         self.configs = configs
-        self.multi_obj_eval = False
 
     def cooperative_coevolution(self, env):
         input_to_hidden_size = (env.get_num_sensors() + 1) * global_env.hidden_neurons

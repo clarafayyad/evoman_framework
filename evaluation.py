@@ -41,11 +41,11 @@ def time_constraint_reward(enemy_health, time):
 
     return max(0, min(reward, 1)) # between 0 and 1
 
-def reward_objectives(env, individual):
+def evaluate_objectives_and_fitness(env, individual):
     fitness, player_life, enemy_life, time = env.play(pcont=individual)
 
     player_health = player_health_reward(player_life)
     enemy_damage = enemy_damage_reward(enemy_life)
     time_reward = time_constraint_reward(enemy_life, time)
 
-    return np.array([player_health, enemy_damage, time_reward])
+    return np.array([player_health, enemy_damage, time_reward]), fitness
