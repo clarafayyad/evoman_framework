@@ -37,6 +37,7 @@ if __name__ == "__main__":
                 tournament_size=multi_obj_hyperparams.tournament_size,
                 mutation_rate=multi_obj_hyperparams.mutation_rate,
                 mutation_sigma=multi_obj_hyperparams.mutation_sigma,
+                selection_pressure=0, # unused here
                 crossover_weight=multi_obj_hyperparams.crossover_weight,
                 crossover_rate=multi_obj_hyperparams.crossover_rate,
             )
