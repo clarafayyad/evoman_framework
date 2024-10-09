@@ -74,8 +74,8 @@ class Subpopulation:
         self.best_individual = self.individuals[operators.select_best_pareto_individual(self.objectives)]
 
         # Compute and log stats
-        # best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        # reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        best_individual_index, mean, std = stats.compute_stats(self.fitness)
+        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
 
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
