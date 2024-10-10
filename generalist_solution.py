@@ -11,7 +11,6 @@ from generalist_test import test_experiment
 from evoman.environment import Environment
 from reporting import start_experiment, end_experiment
 
-
 # Initialize simulation
 env = Environment(experiment_name=global_env.experiment_name,
                   enemies=global_env.enemies,
@@ -37,7 +36,7 @@ if __name__ == "__main__":
                 tournament_size=multi_obj_hyperparams.tournament_size,
                 mutation_rate=multi_obj_hyperparams.mutation_rate,
                 mutation_sigma=multi_obj_hyperparams.mutation_sigma,
-                selection_pressure=0, # unused here
+                selection_pressure=0,  # unused here
                 crossover_weight=multi_obj_hyperparams.crossover_weight,
                 crossover_rate=multi_obj_hyperparams.crossover_rate,
             )
@@ -58,4 +57,3 @@ if __name__ == "__main__":
             ea.cooperative_coevolution(env)
 
     end_experiment(time.time() - ini_time)
-

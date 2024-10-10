@@ -141,6 +141,7 @@ class CoevolutionaryAlgorithm:
 
         best_individual_found = None
         best_fitness_found = 0
+        best_basic_fitness_found = 0
 
         # Co-evolution
         for generation in range(self.configs.total_generations + 1):
@@ -160,14 +161,17 @@ class CoevolutionaryAlgorithm:
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
             current_best_fitness = evaluate_individual(env, generation, self.configs.total_generations, current_best_network)
-            basic_fitness_value = basic_evaluation(env, current_best_network)
-            print('current basic fitness: ', basic_fitness_value)
+            current_basic_fitness_value = basic_evaluation(env, current_best_network)
+            print('current basic fitness: ', current_basic_fitness_value)
             if global_env.apply_dynamic_rewards:
                 print('current dynamic fitness: ', current_best_fitness)
-            reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
 
             if current_best_fitness > best_fitness_found:
                 best_individual_found = current_best_network
                 best_fitness_found = current_best_fitness
+            if current_basic_fitness_value > best_basic_fitness_found:
+                best_basic_fitness_found = current_basic_fitness_value
 
-        reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_fitness_found)
+            reporting.log_stats(global_env.experiment_name, generation, best_basic_fitness_found, 0, 0)
+
+        reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_basic_fitness_found)

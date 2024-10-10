@@ -50,7 +50,7 @@ def dynamic_evaluation(env, generation, total_generations, individual):
         time_weight = 1
 
     # Calculate fitness score
-    return player_health_weight * player_life + enemy_damage_weight * (100 - enemy_life) - time_weight * np.log(time)
+    return player_health_weight * player_life + enemy_damage_weight * (100 - enemy_life) - time_weight * np.log(np.abs(time))
 
 
 def evaluate_population(env, population):

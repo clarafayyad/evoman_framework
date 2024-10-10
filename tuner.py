@@ -4,6 +4,8 @@ import global_env
 from evoman.environment import Environment
 from ea_config import EAConfigs
 from coevolution import CoevolutionaryAlgorithm
+from multi_obj_coevolution import CoevolutionaryMultiObjAlgorithm
+
 
 def objective(trial):
     population_size = trial.suggest_int("population_size", 50, 1000)
@@ -16,10 +18,11 @@ def objective(trial):
     crossover_weight = trial.suggest_float("crossover_weight", 0.1, 0.9)
 
     configs = EAConfigs(population_size, total_generations,
-        tournament_size, mutation_rate, mutation_sigma,
-        selection_pressure, crossover_weight, crossover_rate)
+                        tournament_size, mutation_rate, mutation_sigma,
+                        selection_pressure, crossover_weight, crossover_rate)
     run_ea(configs)
     return fetch_max_fitness()
+
 
 def run_ea(configs):
     env = Environment(experiment_name=global_env.experiment_name,
@@ -32,9 +35,14 @@ def run_ea(configs):
                       speed=global_env.speed,
                       randomini=global_env.random_ini,
                       visuals=global_env.visuals)
-    co_evolutionary_EA = CoevolutionaryAlgorithm(configs)
-    co_evolutionary_EA.multi_obj_eval = global_env.apply_multi_objective
-    co_evolutionary_EA.cooperative_coevolution(env)
+    if global_env.apply_multi_objective:
+        ea = CoevolutionaryMultiObjAlgorithm(configs)
+        ea.cooperative_coevolution(env)
+        return
+
+    ea = CoevolutionaryAlgorithm(configs)
+    ea.cooperative_coevolution(env)
+
 
 def fetch_max_fitness():
     with open('experiments/train_results.csv', mode='r') as file:
@@ -45,6 +53,7 @@ def fetch_max_fitness():
         if last_row:
             return float(last_row[1])
         return None
+
 
 if __name__ == '__main__':
     study = optuna.create_study(direction="maximize")
