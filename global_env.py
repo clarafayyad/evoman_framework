@@ -3,7 +3,6 @@ from demo_controller import player_controller
 # Experimental Setup
 is_test = False
 apply_dynamic_rewards = False
-apply_multi_objective = False
 enemies = [1, 3, 6, 7]
 multiple_mode = 'yes'
 experiment_name = 'experiments'
