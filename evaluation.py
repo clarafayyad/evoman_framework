@@ -17,7 +17,7 @@ def evaluate_individual(env, generation, total_generations, individual):
     :param individual: Numpy array of floats representing the individual.
     :return: float: Fitness value of the individual.
     """
-    if global_env.apply_dynamic_rewards and not global_env.apply_multi_objective:
+    if global_env.apply_dynamic_rewards:
         return dynamic_evaluation(env, generation, total_generations, individual)
     return basic_evaluation(env, individual)
 
@@ -53,15 +53,19 @@ def dynamic_evaluation(env, generation, total_generations, individual):
     return player_health_weight * player_life + enemy_damage_weight * (100 - enemy_life) - time_weight * np.log(np.abs(time))
 
 
-def evaluate_population(env, population):
+def evaluate_population(env, generation, total_generations, population, force_basic_eval=False):
     """
     Evaluate a population given an environment.
     :param env: Simulation Environment
+    :param generation: current generation number of the evolution process
+    :param total_generations: total number of generations of the evolution process
     :param population: 2D numpy array representing individuals in a population.
+    :param force_basic_eval: force basic evaluation of the population. (non-dynamic evaluation)
     :return: A numpy array representing the fitness values.
     """
-    return np.array(list(map(lambda y: basic_evaluation(env, y), population)))
-
+    if force_basic_eval:
+        return np.array(list(map(lambda y: basic_evaluation(env, y), population)))
+    return np.array(list(map(lambda y: evaluate_individual(env, generation, total_generations, y), population)))
 
 def player_health_reward(player_life):
     return player_life

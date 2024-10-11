@@ -1,10 +1,10 @@
 from demo_controller import player_controller
 
 # Experimental Setup
-is_test = False
-apply_dynamic_rewards = False
-enemies = [1, 3, 6, 7]
-multiple_mode = 'yes'
+is_test = True
+apply_dynamic_rewards = True
+enemies = [1]
+multiple_mode = 'no'
 experiment_name = 'experiments'
 
 # Tuner

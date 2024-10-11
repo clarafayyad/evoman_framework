@@ -16,9 +16,6 @@ To train the agent, follow these steps:
    - `apply_dynamic_rewards`: 
      - Set to `True` if you want to apply the dynamic rewards' evaluation.
      - Set to `False` if you prefer the regular evaluation.
-   - `apply_multi_objective`: 
-     - Set to `True` if you want to apply the multi objective evaluation algorithm.
-     - Set to `False` if you prefer the regular co-evolutionary algorithm.
    - `enemies`: Set as a list of enemies (1-8) to train the agent against. 
    - `multiple_mode`:
      - Set to `"yes"` if you are training against more than one enemy. 
@@ -35,9 +32,6 @@ To test the agent, follow these steps:
    - `apply_dynamic_rewards`: 
      - Set to `True` if you want to apply the dynamic rewards' evaluation.
      - Set to `False` if you prefer the regular evaluation.
-   - `apply_multi_objective`: 
-     - Set to `True` if you want to apply the multi objective evaluation algorithm.
-     - Set to `False` if you prefer the regular co-evolutionary algorithm.
    - `enemies`: Set as a list of enemies (1-8) to test the agent against. 
    - `multiple_mode`:
      - Set to `"yes"` if you are testing against more than one enemy. 
@@ -48,8 +42,8 @@ To test the agent, follow these steps:
 
 ## Tuning the Hyperparameters
 
-- The hyperparameters of the regular co-evolutionary algorithm can be found and changed in [the hyperparameters file](hyperparams.py). 
-- The hyperparameters of the multi-objective co-evolutionary algorithm can be found and changed [the multi-obj hyperparameters file](multi_obj_hyperparams.py).
+- The hyperparameters of the regular evolutionary algorithm can be found and changed in [this hyperparameters file](hyperparams.py). 
+- The hyperparameters of the dynamic rewards evolutionary algorithm can be found and changed [this hyperparameters file](dynamic_rewards_hyperparams.py).
 
 To tune the algorithm using optuna, follow these steps: 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
@@ -57,9 +51,6 @@ To tune the algorithm using optuna, follow these steps:
    - `apply_dynamic_rewards`: 
      - Set to `True` if you want to apply the dynamic rewards' evaluation.
      - Set to `False` if you prefer the regular evaluation.
-   - `apply_multi_objective`: 
-     - Set to `True` if you want to apply the multi objective evaluation algorithm.
-     - Set to `False` if you prefer the regular co-evolutionary algorithm.
    - `enemies`: Set as a list of enemies (1-8) to tune the agent against. 
    - `multiple_mode`:
      - Set to `"yes"` if you are tuning against more than one enemy. 

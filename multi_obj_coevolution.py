@@ -166,4 +166,4 @@ class CoevolutionaryMultiObjAlgorithm:
                 best_individual_found = current_best_network
                 best_fitness_found = current_best_fitness
 
-        reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_fitness_found)
+        reporting.save_best_individual(global_env.experiment_name, best_individual_found)

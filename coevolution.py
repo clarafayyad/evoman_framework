@@ -174,4 +174,4 @@ class CoevolutionaryAlgorithm:
 
             reporting.log_stats(global_env.experiment_name, generation, best_basic_fitness_found, 0, 0)
 
-        reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_basic_fitness_found)
+        reporting.save_best_individual(global_env.experiment_name, best_individual_found)

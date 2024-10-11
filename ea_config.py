@@ -1,4 +1,4 @@
-class EAConfigs:
+class EAHyperParams:
     def __init__(self, population_size, total_generations,
                  tournament_size, mutation_rate, mutation_sigma,
                  selection_pressure, crossover_weight, crossover_rate):
