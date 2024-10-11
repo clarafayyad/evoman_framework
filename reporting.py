@@ -3,6 +3,7 @@ import time
 import numpy as np
 import os
 
+
 def save_generation(experiment_name, generation_number):
     generation_file = open(experiment_name + '/gen.txt', 'w')
     generation_file.write(str(generation_number))
@@ -31,6 +32,7 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
         if generation_number == 0:
             results_writer.writerow(['gen', 'best', 'mean', 'std'])
         results_writer.writerow([generation_number, round(max_fitness, 6), round(mean, 6), round(std, 6)])
+
 
 def log_sub_pop_stats(experiment_name, subpop_identifier, generation_number, max_fitness, mean, std):
     # Display relevant message
@@ -89,7 +91,7 @@ def create_logs_directory(experiment_name):
 def log_test_results(apply_coevolution, enemy, player_life, enemy_life, time):
     print(f"\nPlayer Life: {player_life}")
     print(f"Enemy Life: {enemy_life}")
-    if enemy_life > player_life :
+    if enemy_life > player_life:
         print("Result: Player Lost!")
     elif player_life > enemy_life:
         print("Result: Player Won!")
