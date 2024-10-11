@@ -140,7 +140,7 @@ class CoevolutionaryAlgorithm:
         best_fitness_found = 0
 
         # Co-evolution
-        for generation in range(self.configs.total_generations):
+        for generation in range(self.configs.total_generations + 1):
             print('\nGENERATION ', generation)
 
             # Evolve each subpopulation
