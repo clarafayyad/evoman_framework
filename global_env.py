@@ -1,13 +1,13 @@
 from demo_controller import player_controller
 
 # Experimental Setup
-is_test = True
-enemies = [1]
-multiple_mode = 'no'
+is_test = False
+enemies = [4, 6, 7]
+multiple_mode = 'yes'
 experiment_name = 'experiments'
 
 # Tuner
-tuner_trials = 100
+tuner_trials = 30
 
 # NN configuration
 hidden_neurons = 10

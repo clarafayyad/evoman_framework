@@ -3,12 +3,11 @@ import optuna
 import global_env
 from evoman.environment import Environment
 from ea_config import EAConfigs
-from coevolution import CoevolutionaryAlgorithm
-from multi_obj_coevolution import CoevolutionaryMultiObjAlgorithm
+from basic_evolution import BasicEvolutionaryAlgorithm
 
 
 def objective(trial):
-    population_size = trial.suggest_int("population_size", 50, 1000)
+    population_size = trial.suggest_int("population_size", 50, 200)
     total_generations = trial.suggest_int("total_generations", 50, 100)
     tournament_size = trial.suggest_int("tournament_size", 3, 20)
     mutation_rate = trial.suggest_float("mutation_rate", 0.1, 0.9)
@@ -35,13 +34,8 @@ def run_ea(configs):
                       speed=global_env.speed,
                       randomini=global_env.random_ini,
                       visuals=global_env.visuals)
-    if global_env.apply_multi_objective:
-        ea = CoevolutionaryMultiObjAlgorithm(configs)
-        ea.cooperative_coevolution(env)
-        return
-
-    ea = CoevolutionaryAlgorithm(configs)
-    ea.cooperative_coevolution(env)
+    ea = BasicEvolutionaryAlgorithm(configs)
+    ea.execute_evolution(env)
 
 
 def fetch_max_fitness():
