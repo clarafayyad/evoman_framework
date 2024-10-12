@@ -75,7 +75,7 @@ class Subpopulation:
 
         # Compute and log stats
         best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        reporting.log_sub_pop_stats(global_env.experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        reporting.log_sub_pop_stats(global_env.default_experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
 
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
@@ -118,6 +118,7 @@ def evolve_subpop(subpop, generation, best_subnetworks):
 class CoevolutionaryMultiObjAlgorithm:
     def __init__(self, configs):
         self.configs = configs
+        self.experiment = global_env.default_experiment_name
 
     def cooperative_coevolution(self, env):
         input_to_hidden_size = (env.get_num_sensors() + 1) * global_env.hidden_neurons
@@ -155,13 +156,13 @@ class CoevolutionaryMultiObjAlgorithm:
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
             current_best_fitness = evaluate_individual(env, current_best_network)
-            reporting.log_stats(global_env.experiment_name, generation, current_best_fitness, 0, 0)
+            reporting.log_stats(self.experiment, 0, generation, current_best_fitness, 0, 0)
 
             if current_best_fitness > best_fitness_found:
                 best_individual_found = current_best_network
                 best_fitness_found = current_best_fitness
 
-        reporting.save_best_individual(global_env.experiment_name, best_individual_found, best_fitness_found)
+        reporting.save_best_individual(self.experiment, 0, best_individual_found, best_fitness_found)
 
 
 

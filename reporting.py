@@ -17,7 +17,7 @@ def retrieve_last_generation(experiment_name):
     return generation_number
 
 
-def log_stats(experiment_name, generation_number, max_fitness, mean, std):
+def log_stats(experiment_name, run_number, generation_number, max_fitness, mean, std):
     # Display relevant message
     print('\n GENERATION ' + str(generation_number)
           + ' ' + str(round(max_fitness, 6))
@@ -25,7 +25,8 @@ def log_stats(experiment_name, generation_number, max_fitness, mean, std):
           + ' ' + str(round(std, 6)))
 
     # Log to file
-    results_file_path = os.path.join(experiment_name, 'train_results.csv')
+    file_name = 'train_results_' + str(run_number) + '.csv'
+    results_file_path = os.path.join(experiment_name, file_name)
     mode = 'w' if generation_number == 0 else 'a'
     with open(results_file_path, mode=mode, newline='') as results_file:
         results_writer = csv.writer(results_file)
@@ -52,9 +53,10 @@ def log_sub_pop_stats(experiment_name, subpop_identifier, generation_number, max
         results_writer.writerow([generation_number, round(max_fitness, 6), round(mean, 6), round(std, 6)])
 
 
-def save_best_individual(experiment_name, best_individual, best_fitness):
+def save_best_individual(experiment_name, run_number, best_individual, best_fitness):
     print('\n BEST FITNESS ' + str(best_fitness))
-    np.savetxt(experiment_name + '/best.txt', best_individual)
+    file_name = '/best_ind_' + str(run_number) + '.txt'
+    np.savetxt(experiment_name + file_name, best_individual)
 
 
 def start_experiment(experiment_name, is_test=False):

@@ -4,7 +4,10 @@ from demo_controller import player_controller
 is_test = False
 enemies = [4, 6, 7]
 multiple_mode = 'yes'
-experiment_name = 'experiments'
+default_experiment_name = 'experiments'
+
+# Training
+training_runs = 10
 
 # Tuner
 tuner_trials = 30

@@ -8,6 +8,8 @@ from evaluation import evaluate_population
 class BasicEvolutionaryAlgorithm:
     def __init__(self, configs):
         self.configs = configs
+        self.experiment = global_env.default_experiment_name
+        self.run_number = 0
 
     def execute_evolution(self, env):
         # Compute individual size
@@ -27,8 +29,14 @@ class BasicEvolutionaryAlgorithm:
 
         # Compute and log stats
         best_individual_index, mean, std = stats.compute_stats(fitness_values)
-        reporting.log_stats(global_env.experiment_name, generation_number, fitness_values[best_individual_index], mean,
-                            std)
+        reporting.log_stats(
+            self.experiment,
+            self.run_number,
+            generation_number,
+            fitness_values[best_individual_index],
+            mean,
+            std
+        )
 
         # Evolution
         while generation_number < self.configs.total_generations:
@@ -67,12 +75,22 @@ class BasicEvolutionaryAlgorithm:
 
             # Compute and log stats
             best_individual_index, mean, std = stats.compute_stats(fitness_values)
-            reporting.log_stats(global_env.experiment_name, generation_number, fitness_values[best_individual_index],
-                                mean, std)
+            reporting.log_stats(
+                self.experiment,
+                self.run_number,
+                generation_number,
+                fitness_values[best_individual_index],
+                mean,
+                std
+            )
 
         # Save file with the best solution
-        reporting.save_best_individual(global_env.experiment_name, population[best_individual_index],
-                                       fitness_values[best_individual_index])
+        reporting.save_best_individual(
+            self.experiment,
+            self.run_number,
+            population[best_individual_index],
+            fitness_values[best_individual_index]
+        )
 
         # Update and save simulation state
         env.update_solutions([population, fitness_values])
