@@ -7,21 +7,32 @@ A demo can be found here:  https://www.youtube.com/watch?v=ZqaMjd1E4ZI
 
 This project implements a neural network-based agent for a game simulation using evolutionary algorithms. 
 
+## Experimenting
+To experiment and train the agent without saving results for multiple runs, follow these steps:
+
+1. Open [the global env file](global_env.py), and set the following variables according to your needs:
+   - `is_test`: `False`
+   - `enemies`: Set as a list of enemies (1-8) to train the agent against. 
+   - `multiple_mode`:
+     - Set to `"yes"` if you are training against more than one enemy. 
+     - Set to `"no"` if you are training against one enemy only.
+3. Run `generalist_solution.py`.
+4. Stats and best individual will be generated and saved under [the experiments folder](/experiments). This folder will be overwritten everytime you run this file.  
+
+
 ## Training
 
 To train the agent, follow these steps:
 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `is_test`: `False`
-   - `apply_multi_objective`: 
-     - Set to `True` if you want to apply the multi objective evaluation algorithm.
-     - Set to `False` if you prefer the regular co-evolutionary algorithm.
+   - `training_runs`: Set as number of times you want to train the algorithm (default is 10)
    - `enemies`: Set as a list of enemies (1-8) to train the agent against. 
    - `multiple_mode`:
      - Set to `"yes"` if you are training against more than one enemy. 
      - Set to `"no"` if you are training against one enemy only.
-3. Run `generalist_solution.py`.
-4. The stats will be generated under the [experiments](/experiments) folder, and the best solution will be saved in [this file](experiments/best.txt).  
+3. Run `train.py`.
+4. A folder will be created depending on the algorithm chosen and enemies _(ex: train_ea1_4,6,7)_. Per run, two files will be generated under that folder (train_results_i_.csv, and best_ind_i.txt).
 
 ## Testing 
 
@@ -29,9 +40,6 @@ To test the agent, follow these steps:
 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `is_test`: `True`
-   - `apply_multi_objective`: 
-     - Set to `True` if you want to apply the multi objective evaluation algorithm.
-     - Set to `False` if you prefer the regular co-evolutionary algorithm.
    - `enemies`: Set as a list of enemies (1-8) to test the agent against. 
    - `multiple_mode`:
      - Set to `"yes"` if you are testing against more than one enemy. 
@@ -47,10 +55,7 @@ To test the agent, follow these steps:
 
 To tune the algorithm using optuna, follow these steps: 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
-   - `tuner_trials`: This is the number of trials the tuner will run to find the best parameters. 
-   - `apply_multi_objective`: 
-     - Set to `True` if you want to apply the multi objective evaluation algorithm.
-     - Set to `False` if you prefer the regular co-evolutionary algorithm.
+   - `tuner_trials`: This is the number of trials the tuner will run to find the best parameters.
    - `enemies`: Set as a list of enemies (1-8) to tune the agent against. 
    - `multiple_mode`:
      - Set to `"yes"` if you are tuning against more than one enemy. 
