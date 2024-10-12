@@ -11,7 +11,7 @@ from reporting import start_experiment, end_experiment
 from basic_evolution import BasicEvolutionaryAlgorithm
 
 # Initialize simulation
-env = Environment(experiment_name=global_env.experiment_name,
+env = Environment(experiment_name=global_env.default_experiment_name,
                   enemies=global_env.enemies,
                   multiplemode=global_env.multiple_mode,
                   playermode=global_env.player_mode,
@@ -23,7 +23,7 @@ env = Environment(experiment_name=global_env.experiment_name,
                   visuals=global_env.is_test)
 
 if __name__ == "__main__":
-    ini_time = start_experiment(global_env.experiment_name, global_env.is_test)
+    ini_time = start_experiment(global_env.default_experiment_name, global_env.is_test)
 
     if global_env.is_test:
         test_experiment(env)
@@ -56,6 +56,7 @@ if __name__ == "__main__":
             crossover_rate=crossover_rate,
         )
         ea = BasicEvolutionaryAlgorithm(params)
+        ea.experiment = global_env.default_experiment_name
         ea.execute_evolution(env)
 
     end_experiment(time.time() - ini_time)

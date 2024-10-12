@@ -7,7 +7,7 @@ from basic_evolution import BasicEvolutionaryAlgorithm
 
 
 def objective(trial):
-    population_size = trial.suggest_int("population_size", 50, 1000)
+    population_size = trial.suggest_int("population_size", 50, 200)
     total_generations = trial.suggest_int("total_generations", 50, 100)
     tournament_size = trial.suggest_int("tournament_size", 3, 20)
     mutation_rate = trial.suggest_float("mutation_rate", 0.1, 0.9)

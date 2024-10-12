@@ -9,6 +9,8 @@ from evaluation import evaluate_population
 class BasicEvolutionaryAlgorithm:
     def __init__(self, hyperparams):
         self.hyperparams = hyperparams
+        self.experiment = global_env.default_experiment_name
+        self.run_number = 0
 
     def execute_evolution(self, env):
         # Compute individual size
@@ -39,7 +41,8 @@ class BasicEvolutionaryAlgorithm:
         )
         best_individual_index, mean, std = stats.compute_stats(basic_fitness_values)
         reporting.log_stats(
-            global_env.experiment_name,
+            self.experiment,
+            self.run_number,
             generation_number,
             basic_fitness_values[best_individual_index],
             mean,
@@ -104,7 +107,8 @@ class BasicEvolutionaryAlgorithm:
             # Compute and log stats
             best_individual_index, mean, std = stats.compute_stats(basic_fitness_values)
             reporting.log_stats(
-                global_env.experiment_name,
+                self.experiment,
+                self.run_number,
                 generation_number,
                 basic_fitness_values[best_individual_index],
                 mean,
@@ -113,7 +117,12 @@ class BasicEvolutionaryAlgorithm:
 
         # Save file with the best solution
         best_individual_index, _, _ = stats.compute_stats(fitness_values)
-        reporting.save_best_individual(global_env.experiment_name, population[best_individual_index])
+        reporting.save_best_individual(
+            self.experiment,
+            self.run_number,
+            population[best_individual_index],
+            fitness_values[best_individual_index],
+        )
 
         # Update and save simulation state
         env.update_solutions([population, fitness_values])

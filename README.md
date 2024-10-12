@@ -7,12 +7,26 @@ A demo can be found here:  https://www.youtube.com/watch?v=ZqaMjd1E4ZI
 
 This project implements a neural network-based agent for a game simulation using evolutionary algorithms. 
 
+## Experimenting
+To experiment and train the agent without saving results for multiple runs, follow these steps:
+
+1. Open [the global env file](global_env.py), and set the following variables according to your needs:
+   - `is_test`: `False`
+   - `enemies`: Set as a list of enemies (1-8) to train the agent against. 
+   - `multiple_mode`:
+     - Set to `"yes"` if you are training against more than one enemy. 
+     - Set to `"no"` if you are training against one enemy only.
+3. Run `generalist_solution.py`.
+4. Stats and best individual will be generated and saved under [the experiments folder](/experiments). This folder will be overwritten everytime you run this file.  
+
+
 ## Training
 
 To train the agent, follow these steps:
 
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `is_test`: `False`
+   - `training_runs`: Set as number of times you want to train the algorithm (default is 10)
    - `apply_dynamic_rewards`: 
      - Set to `True` if you want to apply the dynamic rewards' evaluation.
      - Set to `False` if you prefer the regular evaluation.
@@ -20,8 +34,8 @@ To train the agent, follow these steps:
    - `multiple_mode`:
      - Set to `"yes"` if you are training against more than one enemy. 
      - Set to `"no"` if you are training against one enemy only.
-3. Run `generalist_solution.py`.
-4. The stats will be generated under the [experiments](/experiments) folder, and the best solution will be saved in [this file](experiments/best.txt).  
+3. Run `train.py`.
+4. A folder will be created depending on the algorithm chosen and enemies _(ex: train_ea1_4,6,7)_. Per run, two files will be generated under that folder (train_results_i_.csv, and best_ind_i.txt).
 
 ## Testing 
 

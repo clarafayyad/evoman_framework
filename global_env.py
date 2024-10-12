@@ -1,14 +1,17 @@
 from demo_controller import player_controller
 
 # Experimental Setup
-is_test = True
+is_test = False
 apply_dynamic_rewards = True
-enemies = [1]
-multiple_mode = 'no'
-experiment_name = 'experiments'
+enemies = [4, 6, 7]
+multiple_mode = 'yes'
+default_experiment_name = 'experiments'
+
+# Training
+training_runs = 2
 
 # Tuner
-tuner_trials = 100
+tuner_trials = 30
 
 # NN configuration
 hidden_neurons = 10
