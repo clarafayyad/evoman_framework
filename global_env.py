@@ -8,7 +8,7 @@ multiple_mode = 'yes'
 default_experiment_name = 'experiments'
 
 # Training
-training_runs = 2
+training_runs = 10
 
 # Tuner
 tuner_trials = 30
