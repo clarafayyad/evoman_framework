@@ -54,7 +54,7 @@ def log_sub_pop_stats(experiment_name, subpop_identifier, generation_number, max
 
 
 def save_best_individual(experiment_name, run_number, best_individual, best_fitness):
-    print('\n BEST FITNESS ' + str(best_fitness))
+    # print('\n BEST FITNESS ' + str(best_fitness))
     file_name = '/best_ind_' + str(run_number) + '.txt'
     np.savetxt(experiment_name + file_name, best_individual)
 

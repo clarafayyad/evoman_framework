@@ -1,26 +1,71 @@
 import numpy as np
 
+import global_env
 
-def evaluate_individual(env, individual):
-    """
-     Evaluate an individual given an environment.
-    :param env: Simulation Environment.
-    :param individual: Numpy array of floats representing the individual.
-    :return: float: Fitness value of the individual.
-    """
+
+def basic_evaluation(env, individual):
+    env.fitness_player_health_weight = 0.1
+    env.fitness_enemy_damage_weight = 0.9
+    env.fitness_time_weight = 1
     fitness, _, _, _ = env.play(pcont=individual)
     return fitness
 
 
-def evaluate_population(env, population):
+def evaluate_individual(env, generation, total_generations, individual):
+    """
+     Evaluate an individual given an environment.
+    :param env: Simulation Environment.
+    :param generation: current generation number of the evolution process
+    :param total_generations: total number of generations of the evolution process
+    :param individual: Numpy array of floats representing the individual.
+    :return: float: Fitness value of the individual.
+    """
+    if global_env.apply_dynamic_rewards:
+        return dynamic_evaluation(env, generation, total_generations, individual)
+    return basic_evaluation(env, individual)
+
+
+def dynamic_evaluation(env, generation, total_generations, individual):
+    # define 3 phases
+    phase_player_health_end = total_generations / 3
+    phase_enemy_damage_end = total_generations / 3 * 2
+    phase_time_constraint_end = total_generations
+
+    # Initialize weights
+    if generation <= phase_player_health_end:
+        env.fitness_player_health_weight = 0.8
+        env.fitness_enemy_damage_weight = 0.2
+        env.fitness_time_weight = 0.0
+    elif generation <= phase_enemy_damage_end:
+        env.fitness_player_health_weight = 0.1
+        env.fitness_enemy_damage_weight = 0.9
+        env.fitness_time_weight = 0.0
+    elif generation <= phase_time_constraint_end:
+        env.fitness_player_health_weight = 0.1
+        env.fitness_enemy_damage_weight = 0.9
+        env.fitness_time_weight = 1.0
+    else:
+        # Default
+        env.fitness_player_health_weight = 0.1
+        env.fitness_enemy_damage_weight = 0.9
+        env.fitness_time_weight = 1
+
+    fitness, _, _, _ = env.play(pcont=individual)
+    return fitness
+
+def evaluate_population(env, generation, total_generations, population, force_basic_eval=False):
     """
     Evaluate a population given an environment.
     :param env: Simulation Environment
+    :param generation: current generation number of the evolution process
+    :param total_generations: total number of generations of the evolution process
     :param population: 2D numpy array representing individuals in a population.
+    :param force_basic_eval: force basic evaluation of the population. (non-dynamic evaluation)
     :return: A numpy array representing the fitness values.
     """
-    return np.array(list(map(lambda y: evaluate_individual(env, y), population)))
-
+    if force_basic_eval:
+        return np.array(list(map(lambda y: basic_evaluation(env, y), population)))
+    return np.array(list(map(lambda y: evaluate_individual(env, generation, total_generations, y), population)))
 
 def player_health_reward(player_life):
     return player_life

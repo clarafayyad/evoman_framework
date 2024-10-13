@@ -1,5 +1,5 @@
 population_size = 150
-total_generations = 100
+total_generations = 150
 tournament_size = 20
 mutation_rate = 0.3
 mutation_sigma = 0.4

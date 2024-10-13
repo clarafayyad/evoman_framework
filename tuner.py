@@ -2,7 +2,7 @@ import csv
 import optuna
 import global_env
 from evoman.environment import Environment
-from ea_config import EAConfigs
+from ea_config import EAHyperParams
 from basic_evolution import BasicEvolutionaryAlgorithm
 
 
@@ -16,15 +16,15 @@ def objective(trial):
     crossover_rate = trial.suggest_float("crossover_rate", 0.1, 0.9)
     crossover_weight = trial.suggest_float("crossover_weight", 0.1, 0.9)
 
-    configs = EAConfigs(population_size, total_generations,
-                        tournament_size, mutation_rate, mutation_sigma,
-                        selection_pressure, crossover_weight, crossover_rate)
+    configs = EAHyperParams(population_size, total_generations,
+                            tournament_size, mutation_rate, mutation_sigma,
+                            selection_pressure, crossover_weight, crossover_rate)
     run_ea(configs)
     return fetch_max_fitness()
 
 
-def run_ea(configs):
-    env = Environment(experiment_name=global_env.experiment_name,
+def run_ea(hyperparams):
+    env = Environment(experiment_name=global_env.default_experiment_name,
                       enemies=global_env.enemies,
                       multiplemode=global_env.multiple_mode,
                       playermode=global_env.player_mode,
@@ -34,7 +34,7 @@ def run_ea(configs):
                       speed=global_env.speed,
                       randomini=global_env.random_ini,
                       visuals=global_env.visuals)
-    ea = BasicEvolutionaryAlgorithm(configs)
+    ea = BasicEvolutionaryAlgorithm(hyperparams)
     ea.execute_evolution(env)
 
 
@@ -54,3 +54,4 @@ if __name__ == '__main__':
     study.optimize(objective, n_trials=global_env.tuner_trials)
     print(f"Best parameters: {study.best_params}")
     print(f"Best fitness: {study.best_value}")
+

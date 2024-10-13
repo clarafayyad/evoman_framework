@@ -16,6 +16,7 @@ JUMP_POP = 'jump'
 SHOOT_POP = 'shoot'
 RELEASE_POP = 'release'
 
+
 class Subpopulation:
     def __init__(self, identifier, individuals, configs):
         self.identifier = identifier
@@ -54,7 +55,8 @@ class Subpopulation:
         # Mutate offspring
         for i in range(len(offspring)):
             # Apply gaussian mutation
-            offspring[i] = operators.gaussian_mutation(offspring[i], rate=self.configs.mutation_rate, sigma=self.configs.mutation_sigma)
+            offspring[i] = operators.gaussian_mutation(offspring[i], rate=self.configs.mutation_rate,
+                                                       sigma=self.configs.mutation_sigma)
             # Clamp the weights and biases within the initial range after applying variation operators
             offspring[i] = operators.clamp_within_bounds(offspring[i], global_env.lower_bound, global_env.upper_bound)
 
@@ -75,7 +77,8 @@ class Subpopulation:
 
         # Compute and log stats
         best_individual_index, mean, std = stats.compute_stats(self.fitness)
-        reporting.log_sub_pop_stats(global_env.default_experiment_name, self.identifier, generation_number, self.fitness[best_individual_index], mean, std)
+        reporting.log_sub_pop_stats(global_env.default_experiment_name, self.identifier, generation_number,
+                                    self.fitness[best_individual_index], mean, std)
 
 
 def combine_subnetworks(current_pop_id, current_individual, best_subnetworks):
@@ -101,7 +104,7 @@ def initialize_random_sub_population(identifier, configs, individual_size):
 
 def evolve_subpop(subpop, generation, best_subnetworks):
     env = Environment(
-        experiment_name=global_env.experiment_name,
+        experiment_name=global_env.default_experiment_name,
         enemies=global_env.enemies,
         multiplemode=global_env.multiple_mode,
         playermode=global_env.player_mode,
@@ -114,6 +117,7 @@ def evolve_subpop(subpop, generation, best_subnetworks):
     )
     subpop.evolve(env, generation, best_subnetworks)
     return subpop
+
 
 class CoevolutionaryMultiObjAlgorithm:
     def __init__(self, configs):
@@ -155,7 +159,8 @@ class CoevolutionaryMultiObjAlgorithm:
 
             # Create best network out of subpopulations
             current_best_network = np.hstack([subpop.best_individual for subpop in subpopulations])
-            current_best_fitness = evaluate_individual(env, current_best_network)
+            current_best_fitness = evaluate_individual(env, generation, self.configs.total_generations,
+                                                       current_best_network)
             reporting.log_stats(self.experiment, 0, generation, current_best_fitness, 0, 0)
 
             if current_best_fitness > best_fitness_found:

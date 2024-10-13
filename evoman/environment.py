@@ -79,6 +79,10 @@ class Environment(object):
         self.visuals = visuals
         self.enemyImports = {e: __import__('evoman.enemy'+str(e), fromlist=['enemy'+str(e)]) for e in self.enemies}
 
+        # Weights to control fitness evaluation
+        self.fitness_player_health_weight = 0.1
+        self.fitness_enemy_damage_weight = 0.9
+        self.fitness_time_weight = 1
 
 
         # initializes default random controllers
@@ -395,7 +399,7 @@ class Environment(object):
 
             # default fitness function for single solutions
     def fitness_single(self):
-        return 0.9*(100 - self.get_enemylife()) + 0.1*self.get_playerlife() - numpy.log(self.get_time())
+        return self.fitness_enemy_damage_weight*(100 - self.get_enemylife()) + self.fitness_player_health_weight*self.get_playerlife() - self.fitness_time_weight*numpy.log(self.get_time())
 
     # default fitness function for consolidating solutions among multiple games
     def cons_multi(self,values):
