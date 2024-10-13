@@ -24,7 +24,7 @@ def objective(trial):
 
 
 def run_ea(hyperparams):
-    env = Environment(experiment_name=global_env.experiment_name,
+    env = Environment(experiment_name=global_env.default_experiment_name,
                       enemies=global_env.enemies,
                       multiplemode=global_env.multiple_mode,
                       playermode=global_env.player_mode,
@@ -54,3 +54,4 @@ if __name__ == '__main__':
     study.optimize(objective, n_trials=global_env.tuner_trials)
     print(f"Best parameters: {study.best_params}")
     print(f"Best fitness: {study.best_value}")
+
