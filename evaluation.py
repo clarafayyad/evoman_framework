@@ -4,6 +4,9 @@ import global_env
 
 
 def basic_evaluation(env, individual):
+    env.fitness_player_health_weight = 0.1
+    env.fitness_enemy_damage_weight = 0.9
+    env.fitness_time_weight = 1
     fitness, _, _, _ = env.play(pcont=individual)
     return fitness
 
@@ -23,8 +26,6 @@ def evaluate_individual(env, generation, total_generations, individual):
 
 
 def dynamic_evaluation(env, generation, total_generations, individual):
-    _, player_life, enemy_life, time = env.play(pcont=individual)
-
     # define 3 phases
     phase_player_health_end = total_generations / 3
     phase_enemy_damage_end = total_generations / 3 * 2
@@ -32,26 +33,25 @@ def dynamic_evaluation(env, generation, total_generations, individual):
 
     # Initialize weights
     if generation <= phase_player_health_end:
-        player_health_weight = 0.9
-        enemy_damage_weight = 0.1
-        time_weight = 0.0
+        env.fitness_player_health_weight = 0.8
+        env.fitness_enemy_damage_weight = 0.2
+        env.fitness_time_weight = 0.0
     elif generation <= phase_enemy_damage_end:
-        player_health_weight = 0.1
-        enemy_damage_weight = 0.9
-        time_weight = 0.0
+        env.fitness_player_health_weight = 0.1
+        env.fitness_enemy_damage_weight = 0.9
+        env.fitness_time_weight = 0.0
     elif generation <= phase_time_constraint_end:
-        player_health_weight = 0.5
-        enemy_damage_weight = 0.5
-        time_weight = 1.0
+        env.fitness_player_health_weight = 0.1
+        env.fitness_enemy_damage_weight = 0.9
+        env.fitness_time_weight = 1.0
     else:
         # Default
-        player_health_weight = 0.1
-        enemy_damage_weight = 0.9
-        time_weight = 1
+        env.fitness_player_health_weight = 0.1
+        env.fitness_enemy_damage_weight = 0.9
+        env.fitness_time_weight = 1
 
-    # Calculate fitness score
-    return player_health_weight * player_life + enemy_damage_weight * (100 - enemy_life) - time_weight * np.log(np.abs(time))
-
+    fitness, _, _, _ = env.play(pcont=individual)
+    return fitness
 
 def evaluate_population(env, generation, total_generations, population, force_basic_eval=False):
     """

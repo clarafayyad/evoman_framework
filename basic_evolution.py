@@ -1,4 +1,6 @@
 # imports
+import numpy as np
+
 import global_env
 import reporting
 import stats
@@ -114,6 +116,9 @@ class BasicEvolutionaryAlgorithm:
                 mean,
                 std
             )
+            print('basic fitness: ', basic_fitness_values[best_individual_index])
+            print('dynamic fitness: ', np.max(fitness_values))
+
 
         # Save file with the best solution
         best_individual_index, _, _ = stats.compute_stats(fitness_values)
