@@ -25,33 +25,24 @@ def evaluate_individual(env, generation, total_generations, individual):
     return basic_evaluation(env, individual)
 
 
-def dynamic_evaluation(env, generation, total_generations, individual):
-    # define 3 phases
-    phase_player_health_end = total_generations / 3
-    phase_enemy_damage_end = total_generations / 3 * 2
-    phase_time_constraint_end = total_generations
+def linear_scale(start_gen, end_gen, start_value, end_value, current_gen):
+    return start_value + (end_value - start_value) * ((current_gen - start_gen) / (end_gen - start_gen))
 
-    # Initialize weights
+
+def dynamic_evaluation(env, generation, total_generations, individual):
+    # Define three phases
+    phase_player_health_end = total_generations
+
+    # Gradually adjust weights based on the current phase
     if generation <= phase_player_health_end:
-        env.fitness_player_health_weight = 0.8
-        env.fitness_enemy_damage_weight = 0.2
-        env.fitness_time_weight = 0.0
-    elif generation <= phase_enemy_damage_end:
-        env.fitness_player_health_weight = 0.1
-        env.fitness_enemy_damage_weight = 0.9
-        env.fitness_time_weight = 0.0
-    elif generation <= phase_time_constraint_end:
-        env.fitness_player_health_weight = 0.1
-        env.fitness_enemy_damage_weight = 0.9
-        env.fitness_time_weight = 1.0
-    else:
-        # Default
-        env.fitness_player_health_weight = 0.1
-        env.fitness_enemy_damage_weight = 0.9
-        env.fitness_time_weight = 1
+        # Transition player health from 0.9 to 0.1, enemy damage from 0.1 to 0.9, and time constraint from 0.0 to 1.0
+        env.fitness_player_health_weight = linear_scale(0, phase_player_health_end, 0.9, 0.1, generation)
+        env.fitness_enemy_damage_weight = linear_scale(0, phase_player_health_end, 0.1, 0.9, generation)
+        env.fitness_time_weight = linear_scale(0, phase_player_health_end, 0.0, 1.0, generation)
 
     fitness, _, _, _ = env.play(pcont=individual)
     return fitness
+
 
 def evaluate_population(env, generation, total_generations, population, force_basic_eval=False):
     """

@@ -39,8 +39,15 @@ To train the agent, follow these steps:
 
 ## Testing 
 
-To test the agent, follow these steps:
+### To test the agent against a specific enemy, follow these steps:
 
+1. Open [the individual test file](individual_test.py), and set the following variables according to your needs:
+   - `best_ind_file_path`: Set as the file path to the player you want to test with _(e.g. 'experiments/best_ind_0.txt')_
+   - `enemy` = Set as the number of enemy you want to test the player against. 
+2. Run `individual_test.py`.
+
+
+### To test a trained agent against enemy groups:
 1. Open [the global env file](global_env.py), and set the following variables according to your needs:
    - `is_test`: `True`
    - `apply_dynamic_rewards`: 
