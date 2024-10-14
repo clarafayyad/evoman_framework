@@ -35,10 +35,10 @@ def dynamic_evaluation(env, generation, total_generations, individual):
 
     # Gradually adjust weights based on the current phase
     if generation <= phase_player_health_end:
-        # Transition player health from 0.9 to 0.1, enemy damage from 0.1 to 0.9
+        # Transition player health from 0.9 to 0.1, enemy damage from 0.1 to 0.9, and time constraint from 0.0 to 1.0
         env.fitness_player_health_weight = linear_scale(0, phase_player_health_end, 0.9, 0.1, generation)
         env.fitness_enemy_damage_weight = linear_scale(0, phase_player_health_end, 0.1, 0.9, generation)
-        env.fitness_time_weight = 0.0
+        env.fitness_time_weight = linear_scale(0, phase_player_health_end, 0.0, 1.0, generation)
 
     fitness, _, _, _ = env.play(pcont=individual)
     return fitness
