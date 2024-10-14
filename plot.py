@@ -59,6 +59,7 @@ plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.legend()
 plt.grid(True)
-plt.show()
 
 plt.savefig('graphs/line_plot_enemies_' + ','.join(map(str, [4, 6, 7])) + '.png', dpi=300)
+
+plt.show()
