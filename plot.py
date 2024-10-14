@@ -46,7 +46,7 @@ plt.fill_between(folder1_data['gen'],
                  color='mediumblue', alpha=0.2, label='EA1 Std')
 
 # Plot for folder 2
-plt.plot(folder2_data['gen'], folder2_data['best_mean'], label='EA2 Best Fitness', color='red', linestyle='--')
+plt.plot(folder2_data['gen'], folder2_data['best_mean'], label='EA2 Best Fitness', color='tomato', linestyle='--')
 plt.plot(folder2_data['gen'], folder2_data['mean_mean'], label='EA2 Mean', color='red', linestyle='--')
 plt.fill_between(folder2_data['gen'],
                  folder2_data['mean_mean'] - folder2_data['mean_std'],
