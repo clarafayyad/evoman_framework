@@ -38,7 +38,7 @@ def dynamic_evaluation(env, generation, total_generations, individual):
         # Transition player health from 0.9 to 0.1, enemy damage from 0.1 to 0.9
         env.fitness_player_health_weight = linear_scale(0, phase_player_health_end, 0.9, 0.1, generation)
         env.fitness_enemy_damage_weight = linear_scale(0, phase_player_health_end, 0.1, 0.9, generation)
-        env.fitness_time_weight = linear_scale(0, phase_player_health_end, 1, 0.0, generation) / 2
+        env.fitness_time_weight = 0.0
 
     fitness, _, _, _ = env.play(pcont=individual)
     return fitness
