@@ -90,7 +90,7 @@ def create_logs_directory(experiment_name):
         os.makedirs('./' + experiment_name)
 
 
-def log_test_results(apply_coevolution, enemy, player_life, enemy_life, time):
+def log_test_results(file_path, player_life, enemy_life, time):
     print(f"\nPlayer Life: {player_life}")
     print(f"Enemy Life: {enemy_life}")
     if enemy_life > player_life:
@@ -100,14 +100,6 @@ def log_test_results(apply_coevolution, enemy, player_life, enemy_life, time):
     else:
         print("Result: It's a Draw!")
 
-    file_name = 'test_'
-    if apply_coevolution:
-        file_name += 'ea2_e'
-    else:
-        file_name += 'ea1_e'
-    file_name += str(enemy) + '.csv'
-
-    file_path = 'testing/' + file_name
     file_exists = os.path.isfile(file_path)
 
     with open(file_path, 'a', newline='') as results_file:
