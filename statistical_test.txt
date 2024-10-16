@@ -1,2 +1,2 @@
-Mann-Whitney U test for enemy group 4,6,7: U-statistic = 50.0, p-value = 1.0000 - No significant difference
-Mann-Whitney U test for enemy group 3,7,8: U-statistic = 22.0, p-value = 0.0376 - Significant difference
+Mann-Whitney U test for enemy group 4,6,7: U-statistic = 63.0, p-value = 0.3447 - No significant difference
+Mann-Whitney U test for enemy group 3,7,8: U-statistic = 25.0, p-value = 0.0640 - No significant difference
