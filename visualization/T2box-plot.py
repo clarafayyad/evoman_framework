@@ -36,4 +36,7 @@ plt.xlabel('Evolutionary Algorithms')
 plt.ylabel('Gains')
 plt.legend(title='Enemy Groups')
 plt.tight_layout()
+
+plt.savefig('../graphs/gain_boxplot_comparison_t2.png')
+
 plt.show()
