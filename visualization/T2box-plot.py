@@ -31,9 +31,9 @@ for file_path in file_paths:
 # Create the box plot
 plt.figure(figsize=(10, 6))
 sns.boxplot(x='EA', y='gain', hue='Enemy Group', data=data_combined, hue_order=['4,6,7', '3,7,8'])
-plt.title('Comparison of Gains for EA1 and EA2 across Enemy Groups')
+plt.title('Boxplot of Gains for EA1 and EA2 across Enemy Groups')
 plt.xlabel('Evolutionary Algorithms')
-plt.ylabel('Gains')
+plt.ylabel('Gain')
 plt.legend(title='Enemy Groups')
 plt.tight_layout()
 

@@ -31,35 +31,35 @@ def aggregate_data(folder_pattern):
 
 
 # Aggregate data from both folders
-folder1_data = aggregate_data('train_ea1_4,6,7/train_*.csv')  # Modify 'folder1' with the actual folder path
-folder2_data = aggregate_data('train_ea2_4,6,7/train_*.csv')  # Modify 'folder2' with the actual folder path
+folder1_data = aggregate_data('train_ea1_3,7,8/train_*.csv')  # Modify 'folder1' with the actual folder path
+folder2_data = aggregate_data('train_ea2_3,7,8/train_*.csv')  # Modify 'folder2' with the actual folder path
 
 # Plotting
 plt.figure(figsize=(10, 6))
 
 # Plot for folder 1
-plt.plot(folder1_data['gen'], folder1_data['best_mean'], label='EA1 Best Fitness', color='skyblue')
+plt.plot(folder1_data['gen'], folder1_data['best_mean'], label='EA1 Best Fitness', color='DodgerBlue')
 plt.plot(folder1_data['gen'], folder1_data['mean_mean'], label='EA1 Mean', color='navy')
 plt.fill_between(folder1_data['gen'],
                  folder1_data['mean_mean'] - folder1_data['mean_std'],
                  folder1_data['mean_mean'] + folder1_data['mean_std'],
-                 color='mediumblue', alpha=0.2, label='EA1 Std')
+                 color='royalblue', alpha=0.2, label='EA1 Std')
 
 # Plot for folder 2
-plt.plot(folder2_data['gen'], folder2_data['best_mean'], label='EA2 Best Fitness', color='tomato', linestyle='--')
-plt.plot(folder2_data['gen'], folder2_data['mean_mean'], label='EA2 Mean', color='red', linestyle='--')
+plt.plot(folder2_data['gen'], folder2_data['best_mean'], label='EA2 Best Fitness', color='orangered', linestyle='--')
+plt.plot(folder2_data['gen'], folder2_data['mean_mean'], label='EA2 Mean', color='brown', linestyle='--')
 plt.fill_between(folder2_data['gen'],
                  folder2_data['mean_mean'] - folder2_data['mean_std'],
                  folder2_data['mean_mean'] + folder2_data['mean_std'],
-                 color='red', alpha=0.2, label='EA2 Std')
+                 color='coral', alpha=0.2, label='EA2 Std')
 
 # Customize the plot
-plt.title('Enemies 4, 6, 7')
+plt.title('Enemy group: [3,7,8]')
 plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.legend()
 plt.grid(True)
 
-plt.savefig('graphs/line_plot_enemies_' + ','.join(map(str, [4, 6, 7])) + '.png', dpi=300)
+plt.savefig('graphs/line_plot_enemies_' + ','.join(map(str, [3,7,8])) + '.png', dpi=300)
 
 plt.show()
