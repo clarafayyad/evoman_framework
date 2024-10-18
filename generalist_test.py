@@ -17,7 +17,7 @@ def test_experiment(env):
     enemy_str = ','.join(map(str, global_env.enemies))
 
     train_folder = 'train_' + ea_str + enemy_str
-    test_folder = 'testing/test_' + ea_str + enemy_str
+    test_file = 'testing/test_' + ea_str + enemy_str + '.csv'
     file_list = glob.glob(train_folder + '/best_ind*.txt')
 
     tests_per_individual = 5
@@ -31,7 +31,7 @@ def test_experiment(env):
         time_results = []
 
         for i in range(tests_per_individual):
-            print('\n RUN #' + str(i + 1) + ' FOR SOLUTION ' + file_name + '\n')
+            print('\n RUN #' + str(i + 1) + ' FOR SOLUTION ' + file_name + ' AGAINST ENEMIES ' + ','.join(map(str, env.enemies)) + '\n')
 
             _, player_life, enemy_life, time = env.play(pcont=best_solution)
 
@@ -43,7 +43,7 @@ def test_experiment(env):
         avg_enemy_life = np.mean(enemy_life_results)
         avg_time_result = np.mean(time_results)
 
-        reporting.log_test_results(test_folder, avg_player_life, avg_enemy_life, avg_time_result)
+        reporting.log_test_results(test_file, avg_player_life, avg_enemy_life, avg_time_result)
 
         player_life_results.clear()
         enemy_life_results.clear()
