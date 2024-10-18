@@ -7,6 +7,7 @@ import reporting
 
 # loads file with the best solution for testing
 def test_experiment(env):
+    env.enemies = [1, 2, 3, 4, 5, 6, 7, 8]  # test against all enemies
     env.update_parameter('speed', 'normal')
 
     ea_str = 'ea1_'
@@ -47,5 +48,3 @@ def test_experiment(env):
         player_life_results.clear()
         enemy_life_results.clear()
         time_results.clear()
-
-
