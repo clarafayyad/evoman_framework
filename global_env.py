@@ -11,7 +11,7 @@ default_experiment_name = 'experiments'
 training_runs = 10
 
 # Tuner
-tuner_trials = 30
+tuner_trials = 100
 
 # NN configuration
 hidden_neurons = 10
